@@ -63,8 +63,8 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
                         .thenValueOf(arrayOf("history").slice().itemCount(-1))
                         .otherwiseValueOf(arrayOf("history").slice().itemCount(1));
 
-        operations.add(geoNear(NearQuery.near(longitude, latitude, Metrics.KILOMETERS)
-                                        .maxDistance(distance/1000).spherical(true), "distance"));
+        operations.add(geoNear(NearQuery.near(longitude, latitude, Metrics.NEUTRAL)
+                                        .maxDistance(distance).spherical(true), "distance"));
         operations.add(project().and("containerNo").as("containerNo")
                                 .and("position").as("position")
                                 .and("street").as("street")
