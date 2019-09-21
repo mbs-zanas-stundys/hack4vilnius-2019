@@ -4,7 +4,7 @@ import Graphic from 'esri/Graphic';
 import { api } from './api';
 import { PROD, SEARCH_RADIUS } from './constants';
 import * as map from './map';
-import { Container } from './types';
+import { ContainerDTO } from './types';
 import { debounce, onMapInteract, replaceMapFeatures, mapContainersToMapFeatures } from './utils';
 
 const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
@@ -83,9 +83,10 @@ function fetchFeaturesByCoords(latitude, longitude) {
       longitude,
       Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 3.14
     )
-    .then((containers: Container[]) => {
-      console.log({ containers, containersWithHistory: containers.filter(c => c.history && c.history.length) });
-      const features = mapContainersToMapFeatures(containers);
+    .then((containers: ContainerDTO[]) => {
+      const items = containers.filter(c => c.history && c.history.length);
+      console.log({ items });
+      const features = mapContainersToMapFeatures(items);
 
       replaceMapFeatures(features);
 

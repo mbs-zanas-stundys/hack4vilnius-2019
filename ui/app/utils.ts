@@ -1,9 +1,13 @@
 import { view, map, featureLayer } from './map';
 import Graphic from 'esri/Graphic';
 import PointGeometry from 'esri/geometry/Point';
-import { Container } from './types';
+import { ContainerDTO, Container, ContainerHistory } from './types';
 
-export const get = (url: string, pathParams: Record<string, any> = {}, params: Record<string, any> = {}) => {
+export const get = async <T = any>(
+  url: string,
+  pathParams: Record<string, any> = {},
+  params: Record<string, any> = {}
+): Promise<T> => {
   const baseUrl = 'http://localhost:8080';
   let httpParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
@@ -16,7 +20,9 @@ export const get = (url: string, pathParams: Record<string, any> = {}, params: R
     httpParams = '?' + httpParams;
   }
 
-  return fetch(baseUrl + constructedPath + httpParams).then(res => res.json());
+  const res = await fetch(baseUrl + constructedPath + httpParams);
+
+  return await res.json();
 };
 
 export const debounce = <T extends Function>(func: T, wait: number, immediate): T => {
@@ -56,7 +62,7 @@ export const replaceMapFeatures = (features: Graphic[]) => {
   });
 };
 
-export const mapContainersToMapFeatures = (containers: Container[]): Graphic[] => {
+export const mapContainersToMapFeatures = (containers: ContainerDTO[]): Graphic[] => {
   return containers.map(
     c =>
       new Graphic({
