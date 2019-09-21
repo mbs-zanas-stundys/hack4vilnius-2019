@@ -23,32 +23,32 @@ import com.opencsv.bean.CsvToBeanBuilder;
 public class ContainerHistoryUploadService implements CsvUploadService {
     @Override
     public void parseFile(Path pathToFile) {
-        try (
-                Reader reader =
-                        new BufferedReader(new FileReader(new File(pathToFile.toString()),
-                                                          Charset.forName("Windows-1257")));
-        ) {
-            CsvToBean<ContainerCsvDto> csvToBean = new CsvToBeanBuilder<ContainerCsvDto>(reader)
-                    .withType(ContainerCsvDto.class)
-                    .withSeparator(';')
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .build();
-
-            List<Container> list = StreamSupport.stream(csvToBean.spliterator(), false)
-                                                .map(this::fromCsv)
-                                                .collect(Collectors.toList());
-            List<String> existingContainers = repository.findAll()
-                                                        .stream()
-                                                        .map(Container::getContainerNo)
-                                                        .collect(Collectors.toList());
-
-            repository.saveAll(list.stream()
-                                   .filter(c-> !existingContainers.contains(c.getContainerNo()))
-                                   .collect(Collectors.toList()));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try (
+//                Reader reader =
+//                        new BufferedReader(new FileReader(new File(pathToFile.toString()),
+//                                                          Charset.forName("Windows-1257")));
+//        ) {
+//            CsvToBean<ContainerCsvDto> csvToBean = new CsvToBeanBuilder<ContainerCsvDto>(reader)
+//                    .withType(ContainerCsvDto.class)
+//                    .withSeparator(';')
+//                    .withIgnoreLeadingWhiteSpace(true)
+//                    .build();
+//
+//            List<Container> list = StreamSupport.stream(csvToBean.spliterator(), false)
+//                                                .map(this::fromCsv)
+//                                                .collect(Collectors.toList());
+//            List<String> existingContainers = repository.findAll()
+//                                                        .stream()
+//                                                        .map(Container::getContainerNo)
+//                                                        .collect(Collectors.toList());
+//
+//            repository.saveAll(list.stream()
+//                                   .filter(c-> !existingContainers.contains(c.getContainerNo()))
+//                                   .collect(Collectors.toList()));
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
