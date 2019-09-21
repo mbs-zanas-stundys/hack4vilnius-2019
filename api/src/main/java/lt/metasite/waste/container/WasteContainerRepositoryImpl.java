@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import com.mongodb.client.model.Projections;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.geoNear;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
@@ -58,13 +59,12 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
 
         List<AggregationOperation> operations = new ArrayList<>();
         ConditionalOperators.Cond historySlice =
-
                 when(valueOf(arrayOf("history").length()).greaterThanValue(0))
                         .thenValueOf(arrayOf("history").slice().itemCount(-1))
                         .otherwiseValueOf(arrayOf("history").slice().itemCount(1));
 
-        operations.add(geoNear(NearQuery.near(longitude, latitude, Metrics.NEUTRAL)
-                                        .maxDistance(distance).spherical(true), "distance"));
+        operations.add(geoNear(NearQuery.near(longitude, latitude, Metrics.KILOMETERS)
+                                        .maxDistance(distance/1000).spherical(true), "distance"));
         operations.add(project().and("containerNo").as("containerNo")
                                 .and("position").as("position")
                                 .and("street").as("street")
@@ -81,10 +81,11 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
                                 .and("houseNo").as("houseNo")
                                 .and("capacity").as("capacity")
                                 .and(historySlice).as("history"));
-
+        operations.add(limit(1500));
         TypedAggregation<Container> aggregation =
                 newAggregation(Container.class,
                                operations
+
                 );
 
         return mongoTemplate.aggregate(aggregation, Container.class).getMappedResults();
