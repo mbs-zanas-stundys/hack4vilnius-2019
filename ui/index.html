@@ -260,11 +260,30 @@
       .d-none {
         display: none !important;
       }
+
+      #legendDiv {
+        background-color: white;
+        padding: 1rem;
+        max-height: 375px;
+        border-radius: 16px;
+        overflow: auto;
+      }
+
+      .esri-legend__layer-table.esri-legend__layer-table--size-ramp:first-child {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <main>
       <div id="viewDiv"></div>
+      <div id="legendDiv">
+        Rūšiavimas<br />
+        Pagal paskutinį išvežimą<br />
+        Pagal išvežimo dažnį<br />
+        Pagal išvežamą svorį<br />
+        <div id="legendContentDiv"></div>
+      </div>
     </main>
 
     <div class="actions-overlay hide">
@@ -300,6 +319,8 @@
         ]
       };
     </script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script src="https://js.arcgis.com/4.12/"></script>
     <script>

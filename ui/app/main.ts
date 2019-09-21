@@ -53,6 +53,7 @@ const csvRenderer = new SimpleRenderer({
       width: 0.5
     }
   }),
+  authoringInfo: {},
   visualVariables: [
     new ColorVariable({
       field: 'Konteinerio_talpa',
@@ -130,7 +131,8 @@ const locateWidget = new LocateWidget({
 });
 
 const legendWidget = new LegendWidget({
-  view
+  view,
+  container: 'legendContentDiv'
 
   // layerInfos: [
   //   {
@@ -140,7 +142,8 @@ const legendWidget = new LegendWidget({
 });
 
 view.ui.add(locateWidget, 'top-left');
-view.ui.add(legendWidget, 'bottom-left');
+// view.ui.add(legendWidget, 'bottom-left');
+view.ui.add('legendDiv', 'bottom-left');
 
 view.on('click', e => {
   console.log('view', {
@@ -153,52 +156,57 @@ view.on('click', e => {
 });
 
 (function initDomElements() {
-  const overlayElement = document.querySelector('.overlay')!;
-  const actionsOverlay = document.querySelector('.actions-overlay')!;
-  const buttonFindLocation = document.getElementById('btn-find-location')!;
-  const buttonEnterAddress = document.getElementById('btn-enter-address')!;
-  const overlayButtons = document.querySelector('.overlay-buttons')!;
-  const overlayForm = document.querySelector('.overlay form')!;
-  const buttonShowMenu = document.getElementById('btn-show-menu')!;
-  const buttonShowMap = document.getElementById('btn-show-map')!;
-  const buttonShowButtons = document.getElementById('btn-show-buttons')!;
+  const overlayElement = $('.overlay')!;
+  const actionsOverlay = $('.actions-overlay')!;
+  const buttonFindLocation = $('#btn-find-location')!;
+  const buttonEnterAddress = $('#btn-enter-address')!;
+  const overlayButtons = $('.overlay-buttons')!;
+  const overlayForm = $('.overlay form')!;
+  const buttonShowMenu = $('#btn-show-menu')!;
+  const buttonShowMap = $('#btn-show-map')!;
+  const buttonShowButtons = $('#btn-show-buttons')!;
+
   const hideOverlay = () => {
-    actionsOverlay.classList.remove('hide');
-    overlayElement.classList.add('hide');
+    actionsOverlay.removeClass('hide');
+    overlayElement.addClass('hide');
     setTimeout(() => {
-      buttonFindLocation.classList.remove('loading');
+      buttonFindLocation.removeClass('loading');
     }, 300);
   };
   const showOverlay = () => {
-    actionsOverlay.classList.add('hide');
-    overlayElement.classList.remove('hide');
+    actionsOverlay.addClass('hide');
+    overlayElement.removeClass('hide');
   };
-  buttonFindLocation.addEventListener('click', e => {
+
+  buttonFindLocation.click(e => {
     e.preventDefault();
-    buttonFindLocation.classList.add('loading');
+    buttonFindLocation.addClass('loading');
     locateWidget
       .locate()
       .then(() => hideOverlay())
       .catch(() => hideOverlay());
   });
-  buttonEnterAddress.addEventListener('click', e => {
+
+  buttonEnterAddress.click(e => {
     e.preventDefault();
-    overlayButtons.classList.add('d-none');
-    overlayForm.classList.remove('d-none');
-    // hideOverlay();
+    overlayButtons.addClass('d-none');
+    overlayForm.removeClass('d-none');
   });
-  buttonShowMap.addEventListener('click', e => {
+
+  buttonShowMap.click(e => {
     e.preventDefault();
     hideOverlay();
   });
-  buttonShowMenu.addEventListener('click', e => {
+
+  buttonShowMenu.click(e => {
     e.preventDefault();
     showOverlay();
   });
-  buttonShowButtons.addEventListener('click', e => {
+
+  buttonShowButtons.click(e => {
     e.preventDefault();
-    overlayButtons.classList.remove('d-none');
-    overlayForm.classList.add('d-none');
+    overlayButtons.removeClass('d-none');
+    overlayForm.addClass('d-none');
   });
 
   if (!PROD) {
