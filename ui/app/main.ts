@@ -83,10 +83,9 @@ function fetchFeaturesByCoords(latitude, longitude) {
       longitude,
       Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 3.14
     )
-    .then((containers: ContainerDTO[]) => {
-      const items = containers.filter(c => c.history && c.history.length);
-      console.log({ items });
-      const features = mapContainersToMapFeatures(items);
+    .then(containers => {
+      console.log({ containers });
+      const features = mapContainersToMapFeatures(containers);
 
       replaceMapFeatures(features);
 

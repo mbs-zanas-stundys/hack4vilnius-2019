@@ -24,6 +24,16 @@ const renderer = new UniqueValueRenderer({
   defaultLabel: 'Nežinoma',
   uniqueValueInfos: [
     {
+      value: Infinity,
+      label: 'Nežinoma',
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+    },
+    {
+      value: 2,
+      label: 'Prieš 2 dienas',
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+    },
+    {
       value: 3,
       label: 'Prieš 3 dienas',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
@@ -34,6 +44,7 @@ const renderer = new UniqueValueRenderer({
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1])
     }
   ],
+
   defaultSymbol: defaultSymbol.clone().set('color', '#ccc')
   // visualVariables: [
   //   new ColorVariable({

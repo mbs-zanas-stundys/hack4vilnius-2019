@@ -1,7 +1,8 @@
-import { view, map, featureLayer } from './map';
-import Graphic from 'esri/Graphic';
 import PointGeometry from 'esri/geometry/Point';
-import { ContainerDTO, Container, ContainerHistory } from './types';
+import Graphic from 'esri/Graphic';
+
+import { featureLayer, view } from './map';
+import { Container } from './types';
 
 export const get = async <T = any>(
   url: string,
@@ -62,7 +63,7 @@ export const replaceMapFeatures = (features: Graphic[]) => {
   });
 };
 
-export const mapContainersToMapFeatures = (containers: ContainerDTO[]): Graphic[] => {
+export const mapContainersToMapFeatures = (containers: Container[]): Graphic[] => {
   return containers.map(
     c =>
       new Graphic({
