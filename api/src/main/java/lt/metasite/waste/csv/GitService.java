@@ -1,5 +1,6 @@
 package lt.metasite.waste.csv;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +9,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,14 +35,14 @@ public class GitService {
         if(!enabled){
             return;
         }
-        Path tempDir = Files.createTempDirectory("waste");
-//        Path tempDir = Path.of("/tmp/waste9631168670229141023");
+//        Path tempDir = Files.createTempDirectory("waste");
+        Path tempDir = Path.of("/tmp/waste9631168670229141023");
         try {
             System.out.println("Cloning " + GIT_URL + " into " + tempDir.toString());
-            Git.cloneRepository()
-               .setURI(GIT_URL)
-               .setDirectory(tempDir.toFile())
-               .call();
+//            Git.cloneRepository()
+//               .setURI(GIT_URL)
+//               .setDirectory(tempDir.toFile())
+//               .call();
 
             Files.walk(tempDir)
                  .filter(f -> f.toString().endsWith(".csv"))

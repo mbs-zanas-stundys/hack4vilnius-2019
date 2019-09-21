@@ -1,6 +1,7 @@
 package lt.metasite.waste.container.schedule;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +13,8 @@ public class Schedule {
     private String containerNo;
     private String company;
     private LocalDate expectedDate;
+    private LocalDateTime actualDate;
+    private Boolean completed;
 
     public String getId() {
         return id;
@@ -43,5 +46,21 @@ public class Schedule {
 
     public void setExpectedDate(LocalDate expectedDate) {
         this.expectedDate = expectedDate;
+    }
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public LocalDateTime getActualDate() {
+        return actualDate;
+    }
+
+    public void setActualDate(LocalDateTime actualDate) {
+        this.actualDate = actualDate;
     }
 }

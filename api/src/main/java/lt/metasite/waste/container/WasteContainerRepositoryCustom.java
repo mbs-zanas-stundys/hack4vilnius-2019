@@ -8,7 +8,7 @@ public interface WasteContainerRepositoryCustom {
 
     List<Container> findByAddress(String street, String houseNo, String flatNo);
 
-    void pushHistory(String containerNo, PickupHistory history);
+    PickupHistory pushHistory(String containerNo, PickupHistory history);
 
     Container findByContainerNo(String containerNo);
 

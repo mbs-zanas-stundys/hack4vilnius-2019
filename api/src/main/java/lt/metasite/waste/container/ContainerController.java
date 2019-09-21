@@ -46,7 +46,7 @@ public class ContainerController {
         return service.getContainer(containerNo);
     }
 
-    @GetMapping("/{containerNo}/schedule")
+    @GetMapping("/{containerNo}/schedulex")
     public List<Schedule> getSchedule(@PathVariable String containerNo,
                                       @RequestParam(required = false) LocalDate dateFrom,
                                       @RequestParam(required = false) LocalDate dateTo){
