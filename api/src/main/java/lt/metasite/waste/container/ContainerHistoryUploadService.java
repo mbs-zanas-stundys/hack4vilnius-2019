@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.stream.StreamSupport;
 
-import lt.metasite.waste.container.dto.ContainerCsvDto;
+import lt.metasite.waste.container.dto.PickupHistoryCsvDto;
 import lt.metasite.waste.csv.CsvUploadService;
 
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
@@ -21,38 +22,50 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 @Service
 public class ContainerHistoryUploadService implements CsvUploadService {
+    private final WasteContainerRepository repository;
+
+    public ContainerHistoryUploadService(WasteContainerRepository repository) {
+        this.repository = repository;
+    }
+
     @Override
     public void parseFile(Path pathToFile) {
-//        try (
-//                Reader reader =
-//                        new BufferedReader(new FileReader(new File(pathToFile.toString()),
-//                                                          Charset.forName("Windows-1257")));
-//        ) {
-//            CsvToBean<ContainerCsvDto> csvToBean = new CsvToBeanBuilder<ContainerCsvDto>(reader)
-//                    .withType(ContainerCsvDto.class)
-//                    .withSeparator(';')
-//                    .withIgnoreLeadingWhiteSpace(true)
-//                    .build();
-//
-//            List<Container> list = StreamSupport.stream(csvToBean.spliterator(), false)
-//                                                .map(this::fromCsv)
-//                                                .collect(Collectors.toList());
-//            List<String> existingContainers = repository.findAll()
-//                                                        .stream()
-//                                                        .map(Container::getContainerNo)
-//                                                        .collect(Collectors.toList());
-//
-//            repository.saveAll(list.stream()
-//                                   .filter(c-> !existingContainers.contains(c.getContainerNo()))
-//                                   .collect(Collectors.toList()));
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try (
+                Reader reader =
+                        new BufferedReader(new FileReader(new File(pathToFile.toString()),
+                                                          Charset.forName("Windows-1257")));
+        ) {
+            CsvToBean<PickupHistoryCsvDto> csvToBean = new CsvToBeanBuilder<PickupHistoryCsvDto>(reader)
+                    .withType(PickupHistoryCsvDto.class)
+                    .withSeparator(';')
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
+
+            StreamSupport.stream(csvToBean.spliterator(), true)
+                         .map(this::fromCsv)
+                         .forEach(p -> repository.pushHistory(p.getFirst(),
+                                                              p.getSecond()));
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public String getFilePattern() {
         return "Konteineriu pakelimai";
+    }
+
+
+    private Pair<String,PickupHistory> fromCsv(PickupHistoryCsvDto csvDto){
+        PickupHistory history = new PickupHistory();
+        history.setWeight(csvDto.getWeight());
+        history.setGarbageTruckRegNo(csvDto.getGarbageTruckRegNo());
+        history.setDate(LocalDateTime.ofInstant(csvDto.getDate().toInstant(),
+                                                ZoneId.systemDefault()));
+        return Pair.of(csvDto.getContainerNo(),history);
+
     }
 }

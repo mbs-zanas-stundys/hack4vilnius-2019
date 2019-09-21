@@ -41,12 +41,23 @@ public class ContainerController {
         return service.findByAddress(street, houseNo, flatNo);
     }
 
+    @GetMapping("/{containerNo}")
+    public Container getContainer(@PathVariable String containerNo){
+        return service.getContainer(containerNo);
+    }
+
     @GetMapping("/{containerNo}/schedule")
-    public List<Schedule> getSchedule(@PathVariable String containerNo, @RequestParam(required =
-            false) LocalDate dateFrom,
+    public List<Schedule> getSchedule(@PathVariable String containerNo,
+                                      @RequestParam(required = false) LocalDate dateFrom,
                                       @RequestParam(required = false) LocalDate dateTo){
         return scheduleService.getScheduleForContainer(containerNo,
                                                        dateFrom == null? LocalDate.now() : dateFrom,
                                                        dateTo == null? LocalDate.now().plusMonths(1).withDayOfMonth(1).minusDays(1): dateTo);
     }
+
+    @GetMapping("/{containerNo}/history")
+    public List<PickupHistory> getContainerPickupHistory(@PathVariable String containerNo){
+        return service.getPickupHistory(containerNo);
+    }
+
 }
