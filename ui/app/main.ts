@@ -13,7 +13,34 @@ import ClassBreaksRenderer from 'esri/renderers/ClassBreaksRenderer';
 import SimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
 import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
+import Graphic from 'esri/Graphic';
+import PointGeometry from 'esri/geometry/Point';
+import PointGeometry from 'esri/geometry/Point';
 import { moment } from './moment-lt';
+
+const get = (url: string, pathParams: Record<string, any> = {}, params: Record<string, any> = {}) => {
+  const baseUrl = 'http://localhost:8080';
+  let httpParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+
+  let constructedPath = url;
+  Object.entries(pathParams).forEach(([key, value]) => (constructedPath = constructedPath.replace(`:${key}`, value)));
+
+  if (httpParams) {
+    httpParams = '?' + httpParams;
+  }
+
+  return fetch(baseUrl + constructedPath + httpParams).then(res => res.json());
+};
+
+const api = {
+  containersByCoordinates: (lat, lon, distance) => get('/containers', undefined, { lat, lon, distance }),
+  containersByAddress: (street, houseNo, flatNo) => get('/containers', undefined, { street, houseNo, flatNo }),
+  containerSchedule: containerId => get('/container/:containerId', { containerId })
+};
+
+window.api = api;
 
 const PROD = false;
 
@@ -32,6 +59,18 @@ interface CSVContainerRow {
   Vezejas: string;
 }
 
+interface Container {
+  capacity: number;
+  company: string;
+  containerNo: string;
+  history: any;
+  houseNo: string;
+  id: string;
+  location: string;
+  position: { x: number; y: number; type: 'Point'; coordinates: [number, number] };
+  street: string;
+}
+
 interface CSVPoint<T> {
   graphic: {
     attributes: T;
@@ -43,8 +82,9 @@ const map = new EsriMap({
 
 const VGTU_COORDINATES = [25.33790900457582, 54.72238152593433];
 
-const csvRenderer = new SimpleRenderer({
-  symbol: new SimpleMarkerSymbol({
+const renderer = new UniqueValueRenderer({
+  uniqueValueInfos: [],
+  defaultSymbol: new SimpleMarkerSymbol({
     size: 24,
     path:
       'M24.2784 7.29299C19.9829 3.06762 13.0185 3.06762 8.723 7.29299C7.70314 8.28937 6.89274 9.47956 6.33945 10.7936C5.78617 12.1077 5.50114 13.5191 5.50114 14.9449C5.50114 16.3707 5.78617 17.7821 6.33945 19.0961C6.89274 20.4102 7.70314 21.6004 8.723 22.5967L16.5 30.2486L24.2784 22.5967C25.2982 21.6004 26.1086 20.4102 26.6619 19.0961C27.2152 17.7821 27.5002 16.3707 27.5002 14.9449C27.5002 13.5191 27.2152 12.1077 26.6619 10.7936C26.1086 9.47956 25.2982 8.28937 24.2784 7.29299ZM16.5 18.5611C15.5815 18.5611 14.7194 18.2036 14.069 17.5546C13.4252 16.9094 13.0636 16.0351 13.0636 15.1236C13.0636 14.2121 13.4252 13.3378 14.069 12.6926C14.718 12.0436 15.5815 11.6861 16.5 11.6861C17.4185 11.6861 18.282 12.0436 18.931 12.6926C19.5748 13.3378 19.9364 14.2121 19.9364 15.1236C19.9364 16.0351 19.5748 16.9094 18.931 17.5546C18.282 18.2036 17.4185 18.5611 16.5 18.5611Z',
@@ -56,7 +96,9 @@ const csvRenderer = new SimpleRenderer({
   authoringInfo: {},
   visualVariables: [
     new ColorVariable({
-      field: 'Konteinerio_talpa',
+      field: 'capacity' as keyof Container,
+      legendOptions: {},
+
       stops: [
         {
           value: 0,
@@ -82,10 +124,10 @@ const csvLayer = new CSVLayer({
   url: '/app/assets/Konteineriu sarasas.csv',
   latitudeField: 'Konteinerio latitude',
   longitudeField: 'Konteinerio longitude',
-  // minScale: 20000,
-  popupEnabled: true,
-  renderer: csvRenderer,
   title: 'Vilniaus konteineriai',
+  // minScale: 20000,
+  renderer: renderer,
+  popupEnabled: true,
   popupTemplate: {
     title: (point: CSVPoint<CSVContainerRow>) => {
       return point.graphic.attributes.Konteinerio_Nr;
@@ -113,7 +155,7 @@ const csvLayer = new CSVLayer({
   }
 });
 
-map.layers.add(csvLayer, 1);
+// map.layers.add(csvLayer, 1);
 
 const view = new MapView({
   map: map,
@@ -142,7 +184,6 @@ const legendWidget = new LegendWidget({
 });
 
 view.ui.add(locateWidget, 'top-left');
-// view.ui.add(legendWidget, 'bottom-left');
 view.ui.add('legendDiv', 'bottom-left');
 
 view.on('click', e => {
@@ -178,13 +219,80 @@ view.on('click', e => {
     overlayElement.removeClass('hide');
   };
 
+  locateWidget.on('click', () => console.log('locateWidget'));
+
+  const fetchFeaturesByCoords = (latitude, longitude) => {
+    api.containersByCoordinates(latitude, longitude, 2000).then((containers: Container[]) => {
+      const features = containers.map(c => ({
+        geometry: new PointGeometry({
+          latitude: c.position.y,
+          longitude: c.position.x
+        }),
+        attributes: {
+          ...c
+        }
+      }));
+
+      const featureLayer = new FeatureLayer({
+        id: 'hello',
+        title: 'Vilniaus konteineriai',
+        renderer,
+        geometryType: 'point',
+        source: features,
+        fields: [
+          {
+            name: 'containerNo',
+            type: 'oid'
+          },
+          {
+            name: 'capacity' as keyof Container,
+            type: 'double'
+          }
+        ],
+        visible: true,
+        objectIdField: 'containerNo' as keyof Container,
+        popupEnabled: true,
+        popupTemplate: {
+          title: (point: CSVPoint<Container>) => {
+            return point.graphic.attributes.containerNo;
+          },
+          content: (point: CSVPoint<Container>) => {
+            console.log({ point });
+            return `
+        <table>
+          <tr><td>Gatvė</td><td>${point.graphic.attributes.street}</td></tr>
+          <tr><td>Namas</td><td>${point.graphic.attributes.houseNo}</td></tr>
+          ${
+            point.graphic.attributes.containerNo
+              ? `<tr><td>Butas</td><td>${point.graphic.attributes.containerNo || 'Nėra'}</td></tr>`
+              : ''
+          }
+          <tr><td>Vietovė</td><td>${point.graphic.attributes.location}</td></tr>
+          <tr><td>Įrašo ID</td><td>${point.graphic.attributes.id}</td></tr>
+          <tr><td>Talpa</td><td>${point.graphic.attributes.capacity} m³</td></tr>
+          <tr><td>Vežėjas</td><td>${point.graphic.attributes.company}</td></tr>
+        </table>`;
+          },
+          outFields: ['capacity']
+        }
+      });
+
+      map.layers.add(featureLayer, 1);
+      console.log({ containers, features });
+    });
+  };
+
   buttonFindLocation.click(e => {
     e.preventDefault();
     buttonFindLocation.addClass('loading');
     locateWidget
       .locate()
+      .then((coordinates: Position) => fetchFeaturesByCoords(coordinates.coords.latitude, coordinates.coords.longitude))
       .then(() => hideOverlay())
-      .catch(() => hideOverlay());
+      .catch(() => {
+        console.log('Could not find location');
+        hideOverlay();
+      });
   });
 
   buttonEnterAddress.click(e => {
@@ -195,6 +303,7 @@ view.on('click', e => {
 
   buttonShowMap.click(e => {
     e.preventDefault();
+    fetchFeaturesByCoords(view.center.latitude, view.center.longitude);
     hideOverlay();
   });
 
@@ -210,6 +319,6 @@ view.on('click', e => {
   });
 
   if (!PROD) {
-    hideOverlay();
+    // buttonFindLocation.click();
   }
 })();
