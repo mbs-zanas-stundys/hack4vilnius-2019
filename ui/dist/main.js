@@ -1,19 +1,37 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/layers/CSVLayer", "esri/widgets/Locate", "esri/widgets/Legend", "esri/renderers/UniqueValueRenderer", "esri/symbols/SimpleMarkerSymbol", "esri/renderers/visualVariables/ColorVariable", "esri/geometry/Point", "./moment-lt"], function (require, exports, Map_1, MapView_1, FeatureLayer_1, CSVLayer_1, Locate_1, Legend_1, UniqueValueRenderer_1, SimpleMarkerSymbol_1, ColorVariable_1, Point_1, moment_lt_1) {
+define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Locate", "esri/widgets/Legend", "esri/renderers/UniqueValueRenderer", "esri/symbols/SimpleMarkerSymbol", "esri/renderers/visualVariables/ColorVariable", "esri/Graphic", "esri/geometry/Point"], function (require, exports, Map_1, MapView_1, FeatureLayer_1, Locate_1, Legend_1, UniqueValueRenderer_1, SimpleMarkerSymbol_1, ColorVariable_1, Graphic_1, Point_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Map_1 = __importDefault(Map_1);
     MapView_1 = __importDefault(MapView_1);
     FeatureLayer_1 = __importDefault(FeatureLayer_1);
-    CSVLayer_1 = __importDefault(CSVLayer_1);
     Locate_1 = __importDefault(Locate_1);
     Legend_1 = __importDefault(Legend_1);
     UniqueValueRenderer_1 = __importDefault(UniqueValueRenderer_1);
     SimpleMarkerSymbol_1 = __importDefault(SimpleMarkerSymbol_1);
     ColorVariable_1 = __importDefault(ColorVariable_1);
+    Graphic_1 = __importDefault(Graphic_1);
     Point_1 = __importDefault(Point_1);
+    function debounce(func, wait, immediate) {
+        var timeout;
+        return function () {
+            var context = this;
+            var args = arguments;
+            var later = function () {
+                timeout = null;
+                if (!immediate)
+                    func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow)
+                func.apply(context, args);
+        };
+    }
+    const SEARCH_RADIUS = 500;
     const get = (url, pathParams = {}, params = {}) => {
         const baseUrl = 'http://localhost:8080';
         let httpParams = Object.entries(params)
@@ -51,11 +69,18 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         visualVariables: [
             new ColorVariable_1.default({
                 field: 'capacity',
-                legendOptions: {},
+                legendOptions: {
+                    title: 'Paskutinis išvežimas'
+                },
                 stops: [
                     {
                         value: 0,
                         color: '#FF4262',
+                        label: '0 m³'
+                    },
+                    {
+                        value: 0.25,
+                        color: '#FF42FF',
                         label: '0 m³'
                     },
                     {
@@ -72,37 +97,6 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
             })
         ]
     });
-    const csvLayer = new CSVLayer_1.default({
-        url: '/app/assets/Konteineriu sarasas.csv',
-        latitudeField: 'Konteinerio latitude',
-        longitudeField: 'Konteinerio longitude',
-        title: 'Vilniaus konteineriai',
-        // minScale: 20000,
-        renderer: renderer,
-        popupEnabled: true,
-        popupTemplate: {
-            title: (point) => {
-                return point.graphic.attributes.Konteinerio_Nr;
-            },
-            content: (point) => {
-                return `
-        <table>
-          <tr><td>Gatvė</td><td>${point.graphic.attributes.Konteinerio_gatve}</td></tr>
-          <tr><td>Namas</td><td>${point.graphic.attributes.Konteinerio_namas}</td></tr>
-          ${point.graphic.attributes.Konteinerio_butas
-                    ? `<tr><td>Butas</td><td>${point.graphic.attributes.Konteinerio_butas || 'Nėra'}</td></tr>`
-                    : ''}
-          <tr><td>Vietovė</td><td>${point.graphic.attributes.Konteinerio_vietove}</td></tr>
-          <tr><td>Įrašo ID</td><td>${point.graphic.attributes.Konteinerio_iraso_ID}</td></tr>
-          <tr><td>Pastatymo data</td><td>${moment_lt_1.moment(point.graphic.attributes.Konteinerio_pastatymo_data).format('YYYY-MM-DD')} </td></tr>
-          <tr><td>Talpa</td><td>${point.graphic.attributes.Konteinerio_talpa} m³</td></tr>
-          <tr><td>Vežėjas</td><td>${point.graphic.attributes.Vezejas}</td></tr>
-        </table>`;
-            },
-            outFields: ['*']
-        }
-    });
-    // map.layers.add(csvLayer, 1);
     const view = new MapView_1.default({
         map: map,
         container: 'viewDiv',
@@ -125,15 +119,78 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         //   }
         // ]
     });
+    const featureLayer = new FeatureLayer_1.default({
+        renderer,
+        geometryType: 'point',
+        visible: true,
+        objectIdField: 'containerNo',
+        source: [],
+        fields: [
+            {
+                name: 'containerNo',
+                type: 'oid'
+            },
+            {
+                name: 'capacity',
+                type: 'double'
+            },
+            {
+                name: 'company',
+                type: 'string'
+            },
+            {
+                name: 'houseNo',
+                type: 'string'
+            },
+            {
+                name: 'street',
+                type: 'string'
+            },
+            {
+                name: 'location',
+                type: 'string'
+            },
+            {
+                name: 'position',
+                type: 'geometry'
+            }
+        ],
+        popupEnabled: true,
+        spatialReference: {
+            wkid: 4326
+        },
+        popupTemplate: {
+            title: (point) => {
+                return (point.graphic.attributes.containerNo +
+                    ' — ' +
+                    point.graphic.attributes.street +
+                    ' ' +
+                    point.graphic.attributes.houseNo);
+            },
+            content: (point) => {
+                console.log({ point });
+                return `
+        <table>
+          <tr><td>Gatvė</td><td>${point.graphic.attributes.street}</td></tr>
+          <tr><td>Namas</td><td>${point.graphic.attributes.houseNo}</td></tr>
+          <tr><td>Vietovė</td><td>${point.graphic.attributes.location}</td></tr>
+          <tr><td>Talpa</td><td>${point.graphic.attributes.capacity} m³</td></tr>
+          <tr><td>Vežėjas</td><td>${point.graphic.attributes.company}</td></tr>
+        </table>`;
+            },
+            outFields: ['*']
+        }
+    });
+    map.layers.add(featureLayer, 1);
     view.ui.add(locateWidget, 'top-left');
     view.ui.add('legendDiv', 'bottom-left');
     view.on('click', e => {
         console.log('view', {
+            view,
             zoom: view.zoom,
             scale: view.scale,
             latitude: e.mapPoint.latitude,
-            longitude: e.mapPoint.longitude,
-            layer: csvLayer
+            longitude: e.mapPoint.longitude
         });
     });
     (function initDomElements() {
@@ -146,7 +203,9 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         const buttonShowMenu = $('#btn-show-menu');
         const buttonShowMap = $('#btn-show-map');
         const buttonShowButtons = $('#btn-show-buttons');
+        const legendDiv = $('#legendDiv');
         const hideOverlay = () => {
+            legendDiv.removeClass('hide');
             actionsOverlay.removeClass('hide');
             overlayElement.addClass('hide');
             setTimeout(() => {
@@ -154,64 +213,40 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
             }, 300);
         };
         const showOverlay = () => {
+            legendDiv.addClass('hide');
             actionsOverlay.addClass('hide');
             overlayElement.removeClass('hide');
         };
         locateWidget.on('click', () => console.log('locateWidget'));
         const fetchFeaturesByCoords = (latitude, longitude) => {
-            api.containersByCoordinates(latitude, longitude, 2000).then((containers) => {
-                const features = containers.map(c => ({
+            api
+                .containersByCoordinates(latitude, longitude, Math.max(view.extent.height, view.extent.width, SEARCH_RADIUS) / 3.14)
+                .then((containers) => {
+                const features = containers.map(c => new Graphic_1.default({
                     geometry: new Point_1.default({
                         latitude: c.position.y,
                         longitude: c.position.x
                     }),
-                    attributes: Object.assign({}, c)
+                    attributes: c
                 }));
-                const featureLayer = new FeatureLayer_1.default({
-                    id: 'hello',
-                    title: 'Vilniaus konteineriai',
-                    renderer,
-                    geometryType: 'point',
-                    source: features,
-                    fields: [
-                        {
-                            name: 'containerNo',
-                            type: 'oid'
-                        },
-                        {
-                            name: 'capacity',
-                            type: 'double'
-                        }
-                    ],
-                    visible: true,
-                    objectIdField: 'containerNo',
-                    popupEnabled: true,
-                    popupTemplate: {
-                        title: (point) => {
-                            return point.graphic.attributes.containerNo;
-                        },
-                        content: (point) => {
-                            console.log({ point });
-                            return `
-        <table>
-          <tr><td>Gatvė</td><td>${point.graphic.attributes.street}</td></tr>
-          <tr><td>Namas</td><td>${point.graphic.attributes.houseNo}</td></tr>
-          ${point.graphic.attributes.containerNo
-                                ? `<tr><td>Butas</td><td>${point.graphic.attributes.containerNo || 'Nėra'}</td></tr>`
-                                : ''}
-          <tr><td>Vietovė</td><td>${point.graphic.attributes.location}</td></tr>
-          <tr><td>Įrašo ID</td><td>${point.graphic.attributes.id}</td></tr>
-          <tr><td>Talpa</td><td>${point.graphic.attributes.capacity} m³</td></tr>
-          <tr><td>Vežėjas</td><td>${point.graphic.attributes.company}</td></tr>
-        </table>`;
-                        },
-                        outFields: ['capacity']
-                    }
+                featureLayer.queryFeatures().then(oldFeatures => {
+                    featureLayer.applyEdits({
+                        addFeatures: features,
+                        deleteFeatures: oldFeatures.features
+                    });
                 });
-                map.layers.add(featureLayer, 1);
-                console.log({ containers, features });
+                view.on('drag', () => {
+                    debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+                });
+                view.on('mouse-wheel', () => {
+                    debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+                });
+                view.on('resize ', () => {
+                    debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+                });
             });
         };
+        const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
         buttonFindLocation.click(e => {
             e.preventDefault();
             buttonFindLocation.addClass('loading');

@@ -15,8 +15,24 @@ import PictureMarkerSymbol from 'esri/symbols/PictureMarkerSymbol';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import Graphic from 'esri/Graphic';
 import PointGeometry from 'esri/geometry/Point';
-import PointGeometry from 'esri/geometry/Point';
 import { moment } from './moment-lt';
+function debounce<T extends Function>(func: T, wait: number, immediate): T {
+  var timeout;
+  return function() {
+    var context = this;
+    var args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  } as any;
+}
+
+const SEARCH_RADIUS = 500;
 
 const get = (url: string, pathParams: Record<string, any> = {}, params: Record<string, any> = {}) => {
   const baseUrl = 'http://localhost:8080';
@@ -97,12 +113,19 @@ const renderer = new UniqueValueRenderer({
   visualVariables: [
     new ColorVariable({
       field: 'capacity' as keyof Container,
-      legendOptions: {},
+      legendOptions: {
+        title: 'Paskutinis išvežimas'
+      },
 
       stops: [
         {
           value: 0,
           color: '#FF4262',
+          label: '0 m³'
+        },
+        {
+          value: 0.25,
+          color: '#FF42FF',
           label: '0 m³'
         },
         {
@@ -119,43 +142,6 @@ const renderer = new UniqueValueRenderer({
     })
   ]
 });
-
-const csvLayer = new CSVLayer({
-  url: '/app/assets/Konteineriu sarasas.csv',
-  latitudeField: 'Konteinerio latitude',
-  longitudeField: 'Konteinerio longitude',
-  title: 'Vilniaus konteineriai',
-  // minScale: 20000,
-  renderer: renderer,
-  popupEnabled: true,
-  popupTemplate: {
-    title: (point: CSVPoint<CSVContainerRow>) => {
-      return point.graphic.attributes.Konteinerio_Nr;
-    },
-    content: (point: CSVPoint<CSVContainerRow>) => {
-      return `
-        <table>
-          <tr><td>Gatvė</td><td>${point.graphic.attributes.Konteinerio_gatve}</td></tr>
-          <tr><td>Namas</td><td>${point.graphic.attributes.Konteinerio_namas}</td></tr>
-          ${
-            point.graphic.attributes.Konteinerio_butas
-              ? `<tr><td>Butas</td><td>${point.graphic.attributes.Konteinerio_butas || 'Nėra'}</td></tr>`
-              : ''
-          }
-          <tr><td>Vietovė</td><td>${point.graphic.attributes.Konteinerio_vietove}</td></tr>
-          <tr><td>Įrašo ID</td><td>${point.graphic.attributes.Konteinerio_iraso_ID}</td></tr>
-          <tr><td>Pastatymo data</td><td>${moment(point.graphic.attributes.Konteinerio_pastatymo_data).format(
-            'YYYY-MM-DD'
-          )} </td></tr>
-          <tr><td>Talpa</td><td>${point.graphic.attributes.Konteinerio_talpa} m³</td></tr>
-          <tr><td>Vežėjas</td><td>${point.graphic.attributes.Vezejas}</td></tr>
-        </table>`;
-    },
-    outFields: ['*']
-  }
-});
-
-// map.layers.add(csvLayer, 1);
 
 const view = new MapView({
   map: map,
@@ -183,16 +169,83 @@ const legendWidget = new LegendWidget({
   // ]
 });
 
+const featureLayer = new FeatureLayer({
+  renderer,
+  geometryType: 'point',
+  visible: true,
+  objectIdField: 'containerNo' as keyof Container,
+  source: [],
+  fields: [
+    {
+      name: 'containerNo' as keyof Container,
+      type: 'oid'
+    },
+    {
+      name: 'capacity' as keyof Container,
+      type: 'double'
+    },
+    {
+      name: 'company' as keyof Container,
+      type: 'string'
+    },
+    {
+      name: 'houseNo' as keyof Container,
+      type: 'string'
+    },
+    {
+      name: 'street' as keyof Container,
+      type: 'string'
+    },
+    {
+      name: 'location' as keyof Container,
+      type: 'string'
+    },
+    {
+      name: 'position' as keyof Container,
+      type: 'geometry'
+    }
+  ],
+  popupEnabled: true,
+  spatialReference: {
+    wkid: 4326
+  },
+  popupTemplate: {
+    title: (point: CSVPoint<Container>) => {
+      return (
+        point.graphic.attributes.containerNo +
+        ' — ' +
+        point.graphic.attributes.street +
+        ' ' +
+        point.graphic.attributes.houseNo
+      );
+    },
+    content: (point: CSVPoint<Container>) => {
+      console.log({ point });
+      return `
+        <table>
+          <tr><td>Gatvė</td><td>${point.graphic.attributes.street}</td></tr>
+          <tr><td>Namas</td><td>${point.graphic.attributes.houseNo}</td></tr>
+          <tr><td>Vietovė</td><td>${point.graphic.attributes.location}</td></tr>
+          <tr><td>Talpa</td><td>${point.graphic.attributes.capacity} m³</td></tr>
+          <tr><td>Vežėjas</td><td>${point.graphic.attributes.company}</td></tr>
+        </table>`;
+    },
+    outFields: ['*']
+  }
+});
+
+map.layers.add(featureLayer, 1);
+
 view.ui.add(locateWidget, 'top-left');
 view.ui.add('legendDiv', 'bottom-left');
 
 view.on('click', e => {
   console.log('view', {
+    view,
     zoom: view.zoom,
     scale: view.scale,
     latitude: e.mapPoint.latitude,
-    longitude: e.mapPoint.longitude,
-    layer: csvLayer
+    longitude: e.mapPoint.longitude
   });
 });
 
@@ -206,8 +259,10 @@ view.on('click', e => {
   const buttonShowMenu = $('#btn-show-menu')!;
   const buttonShowMap = $('#btn-show-map')!;
   const buttonShowButtons = $('#btn-show-buttons')!;
+  const legendDiv = $('#legendDiv')!;
 
   const hideOverlay = () => {
+    legendDiv.removeClass('hide');
     actionsOverlay.removeClass('hide');
     overlayElement.addClass('hide');
     setTimeout(() => {
@@ -215,6 +270,7 @@ view.on('click', e => {
     }, 300);
   };
   const showOverlay = () => {
+    legendDiv.addClass('hide');
     actionsOverlay.addClass('hide');
     overlayElement.removeClass('hide');
   };
@@ -222,65 +278,44 @@ view.on('click', e => {
   locateWidget.on('click', () => console.log('locateWidget'));
 
   const fetchFeaturesByCoords = (latitude, longitude) => {
-    api.containersByCoordinates(latitude, longitude, 2000).then((containers: Container[]) => {
-      const features = containers.map(c => ({
-        geometry: new PointGeometry({
-          latitude: c.position.y,
-          longitude: c.position.x
-        }),
-        attributes: {
-          ...c
-        }
-      }));
+    api
+      .containersByCoordinates(
+        latitude,
+        longitude,
+        Math.max(view.extent.height, view.extent.width, SEARCH_RADIUS) / 3.14
+      )
+      .then((containers: Container[]) => {
+        const features = containers.map(
+          c =>
+            new Graphic({
+              geometry: new PointGeometry({
+                latitude: c.position.y,
+                longitude: c.position.x
+              }),
+              attributes: c
+            })
+        );
 
-      const featureLayer = new FeatureLayer({
-        id: 'hello',
-        title: 'Vilniaus konteineriai',
-        renderer,
-        geometryType: 'point',
-        source: features,
-        fields: [
-          {
-            name: 'containerNo',
-            type: 'oid'
-          },
-          {
-            name: 'capacity' as keyof Container,
-            type: 'double'
-          }
-        ],
-        visible: true,
-        objectIdField: 'containerNo' as keyof Container,
-        popupEnabled: true,
-        popupTemplate: {
-          title: (point: CSVPoint<Container>) => {
-            return point.graphic.attributes.containerNo;
-          },
-          content: (point: CSVPoint<Container>) => {
-            console.log({ point });
-            return `
-        <table>
-          <tr><td>Gatvė</td><td>${point.graphic.attributes.street}</td></tr>
-          <tr><td>Namas</td><td>${point.graphic.attributes.houseNo}</td></tr>
-          ${
-            point.graphic.attributes.containerNo
-              ? `<tr><td>Butas</td><td>${point.graphic.attributes.containerNo || 'Nėra'}</td></tr>`
-              : ''
-          }
-          <tr><td>Vietovė</td><td>${point.graphic.attributes.location}</td></tr>
-          <tr><td>Įrašo ID</td><td>${point.graphic.attributes.id}</td></tr>
-          <tr><td>Talpa</td><td>${point.graphic.attributes.capacity} m³</td></tr>
-          <tr><td>Vežėjas</td><td>${point.graphic.attributes.company}</td></tr>
-        </table>`;
-          },
-          outFields: ['capacity']
-        }
+        featureLayer.queryFeatures().then(oldFeatures => {
+          featureLayer.applyEdits({
+            addFeatures: features,
+            deleteFeatures: oldFeatures.features
+          });
+        });
+
+        view.on('drag', () => {
+          debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+        });
+        view.on('mouse-wheel', () => {
+          debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+        });
+        view.on('resize ', () => {
+          debouncedFetchFeaturesByCoords(view.center.latitude, view.center.longitude);
+        });
       });
-
-      map.layers.add(featureLayer, 1);
-      console.log({ containers, features });
-    });
   };
+
+  const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
 
   buttonFindLocation.click(e => {
     e.preventDefault();
