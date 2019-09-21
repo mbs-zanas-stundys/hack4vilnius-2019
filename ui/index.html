@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
-    <link rel="stylesheet" href="/app/deps/map-styles.css" />
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/css/main.css" />
     <link href="https://fonts.googleapis.com/css?family=Jomhuria|Yantramanav&display=swap" rel="stylesheet" />
 
     <style>
@@ -39,6 +39,10 @@
 
       .esri-view-width-large .esri-popup__main-container {
         max-width: 260px;
+      }
+
+      .esri-ui-bottom-left {
+        bottom: 60px;
       }
 
       .esri-popup__inline-actions-container:only-child > .esri-popup__action,
@@ -92,6 +96,7 @@
         align-items: center;
         flex-direction: column;
         text-align: center;
+        transition: all 0.5s;
       }
 
       .overlay input {
@@ -150,6 +155,7 @@
         color: rgba(0, 0, 0, 0.58);
         transition: all 0.4s;
         cursor: pointer;
+        background: none;
       }
 
       button:hover {
@@ -176,9 +182,83 @@
         background: rgba(133, 192, 74, 0.102);
       }
 
-      button,
-      input {
+      .overlay button,
+      .overlay input {
         min-width: 290px;
+      }
+
+      .hide {
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s;
+      }
+
+      .loading {
+        position: relative;
+      }
+
+      .loading::after {
+        content: '';
+        position: absolute;
+        top: 21px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        margin-top: -12px;
+        margin-left: -12px;
+        border-radius: 1em;
+        border: 2px solid #ffffff4f;
+        border-top-color: white;
+        animation: loading 0.5s linear infinite, fadeIn 0.5s;
+      }
+      @keyframes loading {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .actions-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 1rem;
+        transition: all 0.3s;
+        pointer-events: none;
+      }
+
+      .actions-overlay > * {
+        pointer-events: all;
+      }
+
+      .overlay-buttons,
+      .overlay-form {
+        height: 300px;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.4s;
+      }
+
+      .column {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .d-none {
+        display: none !important;
       }
     </style>
   </head>
@@ -187,17 +267,25 @@
       <div id="viewDiv"></div>
     </main>
 
+    <div class="actions-overlay hide">
+      <button class="primary" id="btn-show-menu" type="button">Grįžti į meniu</button>
+    </div>
     <section class="overlay">
       <div class="overlay-content">
         <img id="logo" src="/app/assets/logo.svg" />
         <p>Vilniaus miesto komunalinių atliekų analitika</p>
-        <button id="btn-find-location" class="primary" type="button">Nustatyti būvimo vietą</button>
-        <button id="btn-enter-address" class="secondary" type="button">Įvesti savo adresą</button>
-        <button id="btn-show-map" type="button">Rodyti žemėlapį</button>
-        <!-- <input type="text" placeholder="Gatvės nr." name="street" />
-        <input type="text" placeholder="Namo nr." name="houseNo" />
-        <input type="text" placeholder="Buto nr." name="flatNo" /> -->
-        <!-- <button type="button">Pirmyn</button> -->
+        <div class="overlay-buttons column fade-in">
+          <button id="btn-find-location" class="primary" type="button">Nustatyti būvimo vietą</button>
+          <button id="btn-enter-address" class="secondary" type="button">Įvesti savo adresą</button>
+          <button id="btn-show-map" type="button">Rodyti žemėlapį</button>
+        </div>
+        <form class="overlay-form column fade-in d-none">
+          <input type="text" placeholder="Gatvės nr." name="street" />
+          <input type="text" placeholder="Namo nr." name="houseNo" />
+          <input type="text" placeholder="Buto nr." name="flatNo" />
+          <button class="primary" type="button">Pirmyn</button>
+          <button id="btn-show-buttons" type="button">Atgal</button>
+        </form>
       </div>
     </section>
     <script>
@@ -215,9 +303,7 @@
 
     <script src="https://js.arcgis.com/4.12/"></script>
     <script>
-      require(['/dist/main.js'], main => {
-        main.init();
-      });
+      require(['/dist/main.js']);
     </script>
   </body>
 </html>
