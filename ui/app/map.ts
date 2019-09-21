@@ -24,7 +24,7 @@ const renderer = new UniqueValueRenderer({
   defaultLabel: 'Nežinoma',
   uniqueValueInfos: [
     {
-      value: Infinity,
+      value: 0,
       label: 'Nežinoma',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
     },

@@ -13,7 +13,7 @@ const mapContainerDto = (dto: ContainerDTO): Container => {
     lastUnloadWords: lastHistoryItem
       ? `${moment(lastHistoryItem.date).fromNow()}, ${moment(lastHistoryItem.date).format('dddd')}`
       : '',
-    lastUnloadDays: lastHistoryItem ? moment().diff(moment(lastHistoryItem.date), 'days') : Infinity
+    lastUnloadDays: lastHistoryItem ? moment().diff(moment(lastHistoryItem.date), 'days') : 0
   };
 };
 
