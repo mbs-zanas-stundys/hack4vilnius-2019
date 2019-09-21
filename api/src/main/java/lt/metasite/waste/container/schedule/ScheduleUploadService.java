@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
+import static java.time.LocalDateTime.now;
+
 @Service
 public class ScheduleUploadService implements CsvUploadService {
 
@@ -70,6 +72,9 @@ public class ScheduleUploadService implements CsvUploadService {
         schedule.setContainerNo(csvDto.getContainerNo());
         schedule.setExpectedDate(LocalDate.ofInstant(csvDto.getExpectedDate().toInstant(),
                                                      ZoneId.systemDefault()));
+        if(schedule.getExpectedDate().isBefore(LocalDate.now())){
+            schedule.setActualDate(now());
+        }
         return schedule;
     }
 }

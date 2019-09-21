@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.util.stream.StreamSupport;
 
 import lt.metasite.waste.container.dto.PickupHistoryCsvDto;
+import lt.metasite.waste.container.schedule.ScheduleRepository;
 import lt.metasite.waste.csv.CsvUploadService;
 
 import org.springframework.data.util.Pair;
@@ -23,9 +24,14 @@ import com.opencsv.bean.CsvToBeanBuilder;
 @Service
 public class ContainerHistoryUploadService implements CsvUploadService {
     private final WasteContainerRepository repository;
+    private final ScheduleRepository scheduleRepository;
 
-    public ContainerHistoryUploadService(WasteContainerRepository repository) {
+
+    public ContainerHistoryUploadService(
+            WasteContainerRepository repository,
+            ScheduleRepository scheduleRepository) {
         this.repository = repository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -43,8 +49,10 @@ public class ContainerHistoryUploadService implements CsvUploadService {
 
             StreamSupport.stream(csvToBean.spliterator(), true)
                          .map(this::fromCsv)
-                         .forEach(p -> repository.pushHistory(p.getFirst(),
-                                                              p.getSecond()));
+                         .peek(p -> repository.pushHistory(p.getFirst(), p.getSecond()))
+                         .forEach(p -> scheduleRepository.setNearestScheduleToCompleted(p.getSecond()
+                                                                                         .getDate(),
+                                                                                        p.getFirst()));
 
 
         } catch (IOException e) {

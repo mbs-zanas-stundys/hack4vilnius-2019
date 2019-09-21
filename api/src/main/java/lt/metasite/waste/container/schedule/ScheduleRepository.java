@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ScheduleRepository extends MongoRepository<Schedule,String> {
+public interface ScheduleRepository extends MongoRepository<Schedule,String>, ScheduleRepositoryCustom {
 
     List<Schedule> findByContainerNoAndExpectedDateIsBetween(String containerNo, LocalDate start, LocalDate end);
+
 }

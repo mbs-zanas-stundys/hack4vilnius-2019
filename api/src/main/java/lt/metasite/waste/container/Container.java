@@ -1,5 +1,6 @@
 package lt.metasite.waste.container;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -23,7 +24,7 @@ public class Container {
     private String location;
     private String houseNo;
     private Double capacity;
-    private List<PickupHistory> history;
+    private List<PickupHistory> history = new ArrayList<>();
 
     public Double getCapacity() {
         return capacity;
