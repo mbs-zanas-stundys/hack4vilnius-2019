@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo:4.2
+    environment:
+      - MONGODB_DATABASE="waste"
+    ports:
+      - 27017:27017
