@@ -40,7 +40,7 @@ const renderer = new UniqueValueRenderer({
     },
     {
       value: 3,
-      label: 'Prieš 3 dienas',
+      label: 'Prieš 3+ dienas',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
     }
   ]
