@@ -59,13 +59,13 @@ public class ScheduleUploadService implements CsvUploadService {
             List<Schedule> list = StreamSupport.stream(csvToBean.spliterator(), true)
                                                .map(this::fromCsv)
                                                .collect(Collectors.toList());
-            List<LocalDate> existingContainers = repository.findAll()
+            List<String> existingContainers = repository.findAll()
                     .stream()
-                    .map(Schedule::getExpectedDate)
+                    .map(s->s.getContainerNo()+"_"+s.getExpectedDate())
                     .collect(Collectors.toList());
 
            repository.saveAll(list.stream()
-                                                .filter(c -> !existingContainers.contains(c.getExpectedDate()))
+                                                .filter(s -> !existingContainers.contains(s.getContainerNo()+"_"+s.getExpectedDate()))
                                                 .collect(Collectors.toList()));
 
            LOGGER.info("Upload finished");
