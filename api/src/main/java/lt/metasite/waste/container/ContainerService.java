@@ -74,11 +74,12 @@ public class ContainerService {
         dto.setLocation(container.getLocation());
         dto.setHouseNo(container.getHouseNo());
         dto.setCapacity(container.getCapacity());
-        dto.setMissedPickUp(container.getHistory().stream()
-                                     .map(PickupHistory::getDate)
-                                     .map(LocalDateTime::toLocalDate)
-                                     .noneMatch(i->i.equals(schedule.getExpectedDate()))
-                                      );
+        if(container.getHistory() != null && !container.getHistory().isEmpty()){
+            dto.setMissedPickUp(container.getHistory().stream()
+                                         .map(PickupHistory::getDate)
+                                         .map(LocalDateTime::toLocalDate)
+                                         .noneMatch(i->i.equals(schedule.getExpectedDate())));
+        }
         dto.setId(container.getId());
         return dto;
     }
