@@ -3,7 +3,9 @@ package lt.metasite.waste.system;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
@@ -32,7 +34,7 @@ public class GitService {
 
     @PostConstruct
     public void checkoutGit() throws IOException {
-        if(!enabled){
+        if (!enabled) {
             return;
         }
         Path tempDir = Files.createTempDirectory("waste");
@@ -43,19 +45,47 @@ public class GitService {
                .setDirectory(tempDir.toFile())
                .call();
 
+
             Files.walk(tempDir)
                  .filter(f -> f.toString().endsWith(".csv"))
-                 .forEach(key -> serviceList.stream()
-                                            .filter(i -> key.getFileName()
-                                                            .toString()
-                                                            .contains(i.getFilePattern()))
-                                            .findFirst()
-                                            .ifPresent(s -> s.parseFile(key)));
+                 .map(key -> serviceList.stream()
+                                        .filter(i -> key.getFileName()
+                                                        .toString()
+                                                        .contains(i.getFilePattern()))
+                                        .findFirst()
+                                        .map(i->new UploadRequest(key,i))
+                                        .orElse(null))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(i->i.getUploadService().getOrder()))
+                .forEach(UploadRequest::upload);
 
             System.out.println("Completed Cloning");
         } catch (Exception e) {
             System.out.println("Exception occurred while cloning repo");
             e.printStackTrace();
+        }
+
+    }
+
+    static class UploadRequest {
+        private final Path pathToFile;
+        private final CsvUploadService uploadService;
+
+        UploadRequest(Path pathToFile, CsvUploadService uploadService) {
+            this.pathToFile = pathToFile;
+            this.uploadService = uploadService;
+        }
+
+        public Path getPathToFile() {
+            return pathToFile;
+        }
+
+        public CsvUploadService getUploadService() {
+            return uploadService;
+        }
+
+        public void upload(){
+            uploadService.parseFile(pathToFile);
         }
 
     }

@@ -79,6 +79,11 @@ public class ScheduleUploadService implements CsvUploadService {
         return "Konteineriu isvezimo grafikas";
     }
 
+    @Override
+    public int getOrder() {
+        return 1;
+    }
+
     private Schedule fromCsv(ScheduleCsvDto csvDto){
         Schedule schedule = new Schedule();
         schedule.setCompany(csvDto.getCompany());

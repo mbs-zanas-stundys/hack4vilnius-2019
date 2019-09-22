@@ -75,6 +75,10 @@ public class ContainerHistoryUploadService implements CsvUploadService {
         return "Konteineriu pakelimai";
     }
 
+    @Override
+    public int getOrder() {
+        return 3;
+    }
 
     private Pair<String, PickupHistory> fromCsv(PickupHistoryCsvDto csvDto){
         PickupHistory history = new PickupHistory();
