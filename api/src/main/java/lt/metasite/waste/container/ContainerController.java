@@ -3,9 +3,6 @@ package lt.metasite.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.schedule.Schedule;
-import lt.metasite.waste.container.schedule.ScheduleService;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

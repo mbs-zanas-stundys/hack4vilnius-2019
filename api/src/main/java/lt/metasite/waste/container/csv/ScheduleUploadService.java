@@ -1,4 +1,4 @@
-package lt.metasite.waste.container.schedule;
+package lt.metasite.waste.container.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,8 +13,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import lt.metasite.waste.csv.CsvUploadService;
+import lt.metasite.waste.container.Schedule;
+import lt.metasite.waste.container.dto.ScheduleCsvDto;
+import lt.metasite.waste.container.repository.ScheduleRepository;
+import lt.metasite.waste.commo.CsvUploadService;
+import lt.metasite.waste.system.GitService;
 
+import org.apache.juli.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
@@ -27,6 +34,9 @@ public class ScheduleUploadService implements CsvUploadService {
 
     private final ScheduleRepository repository;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleUploadService.class);
+
+
     public ScheduleUploadService(ScheduleRepository repository) {
         this.repository = repository;
     }
@@ -38,6 +48,8 @@ public class ScheduleUploadService implements CsvUploadService {
                         new BufferedReader(new FileReader(new File(pathToFile.toString()),
                                                           Charset.forName("Windows-1257")));
         ) {
+
+            LOGGER.info("Upload started");
             CsvToBean<ScheduleCsvDto> csvToBean = new CsvToBeanBuilder<ScheduleCsvDto>(reader)
                     .withType(ScheduleCsvDto.class)
                     .withSeparator(';')
@@ -56,8 +68,9 @@ public class ScheduleUploadService implements CsvUploadService {
                                                 .filter(c -> !existingContainers.contains(c.getExpectedDate()))
                                                 .collect(Collectors.toList()));
 
+           LOGGER.info("Upload finished");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("unkonw error", e);
         }
     }
 
@@ -70,11 +83,7 @@ public class ScheduleUploadService implements CsvUploadService {
         Schedule schedule = new Schedule();
         schedule.setCompany(csvDto.getCompany());
         schedule.setContainerNo(csvDto.getContainerNo());
-        schedule.setExpectedDate(LocalDate.ofInstant(csvDto.getExpectedDate().toInstant(),
-                                                     ZoneId.systemDefault()));
-        if(schedule.getExpectedDate().isBefore(LocalDate.now())){
-            schedule.setActualDate(now());
-        }
+        schedule.setExpectedDate(LocalDate.ofInstant(csvDto.getExpectedDate().toInstant(), ZoneId.systemDefault()));
         return schedule;
     }
 }

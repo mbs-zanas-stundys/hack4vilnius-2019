@@ -1,24 +1,20 @@
-package lt.metasite.waste.container;
+package lt.metasite.waste.container.repository;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import lt.metasite.waste.container.Container;
+import lt.metasite.waste.container.PickupHistory;
 
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
-import org.springframework.data.mongodb.core.aggregation.GeoNearOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
-import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.NearQuery;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-
-import com.mongodb.client.model.Projections;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.geoNear;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;

@@ -1,7 +1,8 @@
-package lt.metasite.waste.container.schedule;
+package lt.metasite.waste.container.repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import lt.metasite.waste.container.Schedule;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,7 +19,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom {
 
     @Override
     public void setNearestScheduleToCompleted(LocalDateTime date, String containerNo) {
-        mongoTemplate.updateFirst(new Query(new Criteria("completed").is(false).and("expectedDate").gte(date.toLocalDate())),
+        mongoTemplate.updateFirst(new Query(new Criteria("actualDate").is(null).and("expectedDate").lte(date.toLocalDate())),
                                   Update.update("actualDate",date),
                                   Schedule.class);
     }

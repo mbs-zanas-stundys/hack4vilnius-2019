@@ -1,4 +1,4 @@
-package lt.metasite.waste.container.schedule;
+package lt.metasite.waste.container.repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

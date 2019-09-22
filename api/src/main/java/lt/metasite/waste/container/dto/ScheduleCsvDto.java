@@ -1,4 +1,4 @@
-package lt.metasite.waste.container.schedule;
+package lt.metasite.waste.container.dto;
 
 import java.util.Date;
 

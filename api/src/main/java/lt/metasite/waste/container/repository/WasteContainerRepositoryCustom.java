@@ -1,6 +1,9 @@
-package lt.metasite.waste.container;
+package lt.metasite.waste.container.repository;
 
 import java.util.List;
+
+import lt.metasite.waste.container.Container;
+import lt.metasite.waste.container.PickupHistory;
 
 public interface WasteContainerRepositoryCustom {
 
