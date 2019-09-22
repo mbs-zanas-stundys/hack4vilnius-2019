@@ -27,7 +27,7 @@ const mapContainerDto = (dto: ContainerDTO): Container => {
 
   return {
     ...dto,
-    missedPickUp: typeof dto.missedPickUp === 'boolean' ? String(dto.missedPickUp) : '',
+    missedPickUp: typeof dto.missedPickUp === 'boolean' ? String(dto.missedPickUp) : 'Nežinoma',
     lastUnload: lastHistoryItem ? moment(lastHistoryItem.date).format('YYYY-MM-DD HH:mm') : 'Nežinoma',
     lastUnloadWords: lastHistoryItem
       ? `${moment(lastHistoryItem.date).fromNow()}, ${moment(lastHistoryItem.date).format('dddd')}`

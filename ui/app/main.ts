@@ -143,6 +143,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
     [DataType.missedPickups]: () => {
       api.containersMissedPickups().then(containers => {
         const features = mapContainersToMapFeatures(containers);
+        console.log('missedPickups', { containers });
 
         map.featureLayer.set('renderer', map.missedPickUpRenderer);
         replaceMapFeatures(features);

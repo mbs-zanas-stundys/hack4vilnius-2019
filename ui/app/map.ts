@@ -88,6 +88,11 @@ export const missedPickUpRenderer = new UniqueValueRenderer({
   },
   uniqueValueInfos: [
     {
+      value: 'Nežinoma',
+      label: 'Nežinoma',
+      symbol: defaultSymbol.clone().set('color', '#ccc')
+    },
+    {
       value: 'false',
       label: 'Nepraleista',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
@@ -233,9 +238,9 @@ const featureLayer = new FeatureLayer({
         [DataType.unloadRatio]: () => {
           return `
             <table>
-              <tr><td>Data</td><td>${moment(a.date).format('YYYY-MM-DD')}</td></tr>
-              <tr><td>Talpa</td><td>${a.capacity} m³</td></tr>
-              <tr><td>Svoris</td><td>${a.weight} kg</td></tr>
+              <tr><td>Pask. vėžimo data</td><td>${moment(a.date).format('YYYY-MM-DD')}</td></tr>
+              <tr><td>Pask. vėžimo svoris</td><td>${a.weight} kg</td></tr>
+              <tr><td>Konteinerio talpa</td><td>${a.capacity} m³</td></tr>
               <tr><td>Iškr. santykis</td><td>${Math.round(a.ratio * 100) / 100} kg/m³</td></tr>
             </table>
           `;
