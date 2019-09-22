@@ -39,19 +39,6 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
         this.mongoTemplate = mongoTemplate;
     }
 
-//    @Override
-//    public List<Container> findByGeoLocation(Double longitude, Double latitude, Double distance) {
-//
-//        Query query =
-//                new Query(new Criteria("position").nearSphere(new GeoJsonPoint(
-//                        longitude,
-//                        latitude)).maxDistance(distance));
-//
-//
-//        return mongoTemplate.find(query, Container.class);
-//
-//    }
-
     @Override
     public List<Container> findByGeoLocation(Double longitude, Double latitude, Double distance) {
 
@@ -64,6 +51,8 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
 
         operations.add(geoNear(NearQuery.near(longitude, latitude, Metrics.KILOMETERS)
                                         .maxDistance(distance/1000).spherical(true), "distance"));
+        //Fixme slice on nullable array
+
         operations.add(project().and("containerNo").as("containerNo")
                                 .and("position").as("position")
                                 .and("street").as("street")
@@ -107,6 +96,7 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
                 when(valueOf(arrayOf("history").length()).greaterThanValue(0))
                         .thenValueOf(arrayOf("history").slice().itemCount(-1))
                         .otherwiseValueOf(arrayOf("history").slice().itemCount(1));
+        //Fixme slice on nullable array
         operations.add(project().and("containerNo").as("containerNo")
                                 .and("position").as("position")
                                 .and("street").as("street")
@@ -143,20 +133,6 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
     public Container findByContainerNo(String containerNo) {
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(match(new Criteria("containerNo").is(containerNo)));
-        ConditionalOperators.Cond historySlice =
-                when(valueOf(arrayOf("history").length()).greaterThanValue(0))
-                        .thenValueOf(arrayOf("history").slice().itemCount(-3))
-                        .otherwiseValueOf(arrayOf("history").slice().itemCount(1));
-
-        operations.add(project().and("containerNo").as("containerNo")
-        .and("position").as("position")
-        .and("street").as("street")
-        .and("company").as("company")
-        .and("location").as("location")
-        .and("houseNo").as("houseNo")
-        .and("capacity").as("capacity")
-        .and(historySlice).as("history"));
-
         TypedAggregation<Container> aggregation =
                 newAggregation(Container.class,
                                operations

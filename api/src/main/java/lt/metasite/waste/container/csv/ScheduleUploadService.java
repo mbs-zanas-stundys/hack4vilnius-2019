@@ -66,6 +66,7 @@ public class ScheduleUploadService implements CsvUploadService {
 
            repository.saveAll(list.stream()
                                                 .filter(s -> !existingContainers.contains(s.getContainerNo()+"_"+s.getExpectedDate()))
+                                                .filter(s->s.getExpectedDate().isAfter(LocalDate.parse("2019-09-09"))) // Temp fix
                                                 .collect(Collectors.toList()));
 
            LOGGER.info("Upload finished");

@@ -14,7 +14,7 @@ public class Schedule {
     private String company;
     private LocalDate expectedDate;
     private LocalDateTime actualDate;
-    private Boolean completed;
+    private Boolean wasLate;
 
     public String getId() {
         return id;
@@ -48,12 +48,12 @@ public class Schedule {
         this.expectedDate = expectedDate;
     }
 
-    public Boolean getCompleted() {
-        return completed;
+    public Boolean getWasLate() {
+        return wasLate;
     }
 
-    public void setCompleted(Boolean completed) {
-        this.completed = completed;
+    public void setWasLate(Boolean wasLate) {
+        this.wasLate = wasLate;
     }
 
     public LocalDateTime getActualDate() {
