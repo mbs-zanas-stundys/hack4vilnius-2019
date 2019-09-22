@@ -1,7 +1,7 @@
 import { SimpleMarkerSymbol } from 'esri/symbols';
 
+export const PRODUCTION = true;
 export const SEARCH_RADIUS = 500;
-export const PROD = false;
 export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
 export const LEGEND_COLORS = ['#43A047', '#FDC010', '#009DFF', '#FF4262'];
 
