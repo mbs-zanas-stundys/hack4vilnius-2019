@@ -6,7 +6,7 @@ import MapView from 'esri/views/MapView';
 import LegendWidget from 'esri/widgets/Legend';
 import LocateWidget from 'esri/widgets/Locate';
 
-import { defaultSymbol, LEGEND_COLORS, VGTU_COORDINATES } from './constants';
+import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from './constants';
 import { Container, CSVPoint } from './types';
 
 const map = new EsriMap({
@@ -24,28 +24,28 @@ const renderer = new UniqueValueRenderer({
   defaultLabel: 'Nežinoma',
   uniqueValueInfos: [
     {
-      value: 0,
+      value: 'Nežinoma',
       label: 'Nežinoma',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[2])
+    },
+    {
+      value: 1,
+      label: 'Vakar',
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
     },
     {
       value: 2,
       label: 'Prieš 2 dienas',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1])
     },
     {
       value: 3,
       label: 'Prieš 3 dienas',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
-    },
-    {
-      value: 4,
-      label: 'Prieš 4 dienas',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
     }
-  ],
+  ]
 
-  defaultSymbol: defaultSymbol.clone().set('color', '#ccc')
+  // defaultSymbol: defaultSymbol.clone().set('color', '#ccc')
   // visualVariables: [
   //   new ColorVariable({
   //     field: 'lastUnloadDays' as keyof Container,
@@ -82,7 +82,7 @@ const renderer = new UniqueValueRenderer({
 const view = new MapView({
   map: map,
   container: 'viewDiv',
-  center: VGTU_COORDINATES,
+  center: START_COORDINATES,
   zoom: 16,
   constraints: {
     minZoom: 14,
@@ -103,12 +103,16 @@ const featureLayer = new FeatureLayer({
   renderer,
   geometryType: 'point',
   visible: true,
-  objectIdField: 'containerNo' as keyof Container,
+  objectIdField: 'id' as keyof Container,
   source: [],
   fields: [
     {
-      name: 'containerNo' as keyof Container,
+      name: 'id' as keyof Container,
       type: 'oid'
+    },
+    {
+      name: 'containerNo' as keyof Container,
+      type: 'string'
     },
     {
       name: 'capacity' as keyof Container,
@@ -144,7 +148,7 @@ const featureLayer = new FeatureLayer({
     },
     {
       name: 'lastUnloadDays' as keyof Container,
-      type: 'integer'
+      type: 'blob'
     },
     {
       name: 'lastUnloadWords' as keyof Container,
@@ -168,15 +172,9 @@ const featureLayer = new FeatureLayer({
     content: (point: CSVPoint<Container>) => {
       const a = point.graphic.attributes;
       console.log({ a });
-      return `
-        <table>
-          <tr><td>Gatvė</td><td>${a.street}</td></tr>
-          <tr><td>Namas</td><td>${a.houseNo}</td></tr>
-          <tr><td>Vietovė</td><td>${a.location}</td></tr>
-          <tr><td>Talpa</td><td>${a.capacity} m³</td></tr>
-          <tr><td>Vežėjas</td><td>${a.company}</td></tr>
-          <tr><td>Pask. išvėžimas</td><td title="${a.lastUnload}">${a.lastUnloadWords}</td></tr>
-        </table>`;
+      return `  
+        <container-history container-no="${a.containerNo}"></container-history>
+        `;
     },
     outFields: ['*']
   }

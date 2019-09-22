@@ -6,6 +6,7 @@ import { PROD, SEARCH_RADIUS } from './constants';
 import * as map from './map';
 import { ContainerDTO } from './types';
 import { debounce, onMapInteract, replaceMapFeatures, mapContainersToMapFeatures } from './utils';
+import './container-history';
 
 const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
 const overlayElement = $('.overlay')!;
@@ -18,6 +19,7 @@ const btnShowMenu = $('#btn-show-menu')!;
 const btnShowMap = $('#btn-show-map')!;
 const btnShowButtons = $('#btn-show-buttons')!;
 const legendDiv = $('#legendDiv')!;
+const btnSubmitAddress = $('#btn-submit-address')!;
 
 btnFindLocation.click(e => {
   e.preventDefault();
@@ -42,6 +44,16 @@ btnEnterAdress.click(e => {
 btnShowMap.click(e => {
   e.preventDefault();
   fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
+  hideOverlay();
+});
+
+btnSubmitAddress.click(e => {
+  e.preventDefault();
+  fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
+  setTimeout(() => {
+    overlayButtons.removeClass('d-none');
+    overlayForm.addClass('d-none');
+  }, 300);
   hideOverlay();
 });
 
@@ -84,7 +96,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
       Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 3.14
     )
     .then(containers => {
-      console.log({ containers });
+      console.log({ containers, withLocation: containers.filter(c => c.history.length) });
       const features = mapContainersToMapFeatures(containers);
 
       replaceMapFeatures(features);

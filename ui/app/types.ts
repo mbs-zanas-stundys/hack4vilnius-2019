@@ -19,11 +19,20 @@ export interface ContainerDTO {
 export interface Container extends ContainerDTO {
   lastUnload: string;
   lastUnloadWords: string;
-  lastUnloadDays: number;
+  lastUnloadDays: number | string;
 }
 
 export interface CSVPoint<T> {
   graphic: {
     attributes: T;
   };
+}
+
+export interface Schedule {
+  id: string;
+  containerNo: string;
+  company: string;
+  expectedDate: string;
+  actualDate?: string;
+  completed?: boolean;
 }

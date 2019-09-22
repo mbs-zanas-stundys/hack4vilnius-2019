@@ -2,8 +2,8 @@ import { SimpleMarkerSymbol } from 'esri/symbols';
 
 export const SEARCH_RADIUS = 500;
 export const PROD = false;
-export const VGTU_COORDINATES = [25.33790900457582, 54.72238152593433];
-export const LEGEND_COLORS = ['#43A047', '#FDC010', '#FF42FF', '#FF4262'];
+export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
+export const LEGEND_COLORS = ['#43A047', '#FDC010', '#009DFF', '#FF4262'];
 
 export const defaultSymbol = new SimpleMarkerSymbol({
   size: 24,
