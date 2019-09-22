@@ -2,7 +2,7 @@ import PointGeometry from 'esri/geometry/Point';
 import Graphic from 'esri/Graphic';
 
 import { api } from './api';
-import { PROD, SEARCH_RADIUS } from './constants';
+import { SEARCH_RADIUS, PRODUCTION } from './constants';
 import * as map from './map';
 import { ContainerDTO, DataType } from './types';
 import { debounce, onMapInteract, replaceMapFeatures, mapContainersToMapFeatures } from './utils';
@@ -73,7 +73,7 @@ dataTypeSelect.change(() => {
   fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
 });
 
-if (!PROD) {
+if (!PRODUCTION) {
   map.view.when(() => {
     btnShowMap.click();
   });

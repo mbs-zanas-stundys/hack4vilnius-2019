@@ -74,12 +74,12 @@ export const unloadRenderer = new UniqueValueRenderer({
         },
         {
           value: 7.5,
-          label: '7.5 — 10 kg/m³',
-          color: LEGEND_COLORS[0]
+          label: '7.5 - 10.0 kg/m³',
+          color: LEGEND_COLORS[2]
         },
         {
           value: 10,
-          label: '>10 kg/m³',
+          label: '>10.0 kg/m³',
           color: LEGEND_COLORS[2]
         }
       ]
