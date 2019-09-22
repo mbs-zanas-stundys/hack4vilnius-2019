@@ -79,6 +79,7 @@ public class ContainerService {
                                      .map(LocalDateTime::toLocalDate)
                                      .noneMatch(i->i.equals(schedule.getExpectedDate()))
                                       );
+        dto.setId(container.getId());
         return dto;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 public class ContainerDto {
 
+    private String id;
     private String containerNo;
     private GeoJsonPoint position;
     private String street;
@@ -82,5 +83,13 @@ public class ContainerDto {
 
     public void setMissedPickUp(boolean missedPickUp) {
         this.missedPickUp = missedPickUp;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
