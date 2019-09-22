@@ -19,7 +19,7 @@ public class ContainerDto {
     private String location;
     private String houseNo;
     private Double capacity;
-    private boolean missedPickUp;
+    private Boolean missedPickUp;
 
     public String getContainerNo() {
         return containerNo;
@@ -77,19 +77,19 @@ public class ContainerDto {
         this.capacity = capacity;
     }
 
-    public boolean isMissedPickUp() {
-        return missedPickUp;
-    }
-
-    public void setMissedPickUp(boolean missedPickUp) {
-        this.missedPickUp = missedPickUp;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Boolean getMissedPickUp() {
+        return missedPickUp;
+    }
+
+    public void setMissedPickUp(Boolean missedPickUp) {
+        this.missedPickUp = missedPickUp;
     }
 }
