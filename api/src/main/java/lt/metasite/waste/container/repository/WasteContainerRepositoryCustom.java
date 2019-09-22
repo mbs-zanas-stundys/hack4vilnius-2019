@@ -4,6 +4,7 @@ import java.util.List;
 
 import lt.metasite.waste.container.Container;
 import lt.metasite.waste.container.PickupHistory;
+import lt.metasite.waste.container.dto.ContainerFlatListDto;
 
 public interface WasteContainerRepositoryCustom {
 
@@ -16,4 +17,6 @@ public interface WasteContainerRepositoryCustom {
     Container findByContainerNo(String containerNo);
 
     List<PickupHistory> getPickupHistory(String pickupHistory);
+
+    List<ContainerFlatListDto> getLowRationContainers();
 }
