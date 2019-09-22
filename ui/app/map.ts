@@ -7,7 +7,8 @@ import LegendWidget from 'esri/widgets/Legend';
 import LocateWidget from 'esri/widgets/Locate';
 
 import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from './constants';
-import { Container, CSVPoint } from './types';
+import { Container, CSVPoint, DataType } from './types';
+import moment from 'moment';
 
 const map = new EsriMap({
   basemap: 'topo-vector'
@@ -16,18 +17,15 @@ const map = new EsriMap({
 const symbols = defaultSymbol.clone();
 symbols.set('color', 'green');
 
-const companyRenderer = new UniqueValueRenderer({
+export const companyRenderer = new UniqueValueRenderer({
   field: 'company' as keyof Container,
   legendOptions: {
     title: 'Paskutinis išvežimas'
   },
   defaultLabel: 'Nežinoma',
+  // defaultSymbol: defaultSymbol.clone(),
+
   uniqueValueInfos: [
-    // {
-    //   value: 'Nežinoma',
-    //   label: 'Nežinoma',
-    //   symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[2])
-    // },
     {
       value: 'VSA Vilnius',
       label: 'VSA Vilnius',
@@ -44,39 +42,49 @@ const companyRenderer = new UniqueValueRenderer({
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
     }
   ]
+});
 
-  // defaultSymbol: defaultSymbol.clone().set('color', '#ccc')
-  // visualVariables: [
-  //   new ColorVariable({
-  //     field: 'lastUnloadDays' as keyof Container,
-  //     legendOptions: {
-  //       title: 'Paskutinis išvežimas'
-  //     },
-
-  //     stops: [
-  //       {
-  //         value: 0,
-  //         color: LEGEND_COLORS[3],
-  //         label: 'Šiandien'
-  //       },
-  //       {
-  //         value: 1,
-  //         color: LEGEND_COLORS[2],
-  //         label: 'Vakar'
-  //       },
-  //       {
-  //         value: 3.5,
-  //         label: 'Prieš 2 dienas',
-  //         color: LEGEND_COLORS[1]
-  //       },
-  //       {
-  //         value: 4.5,
-  //         label: 'Prieš 4 dienas',
-  //         color: LEGEND_COLORS[0]
-  //       }
-  //     ]
-  //   })
-  // ]
+export const unloadRenderer = new UniqueValueRenderer({
+  field: 'ratio' as keyof Container,
+  legendOptions: {
+    title: 'Paskutinis išvežimas'
+  },
+  defaultSymbol: defaultSymbol.clone(),
+  visualVariables: [
+    new ColorVariable({
+      field: 'ratio' as keyof Container,
+      legendOptions: {
+        title: 'Paskutinis išvežimas'
+      },
+      stops: [
+        {
+          value: 0,
+          color: LEGEND_COLORS[3],
+          label: '<2.5 kg/m³'
+        },
+        {
+          value: 2.5,
+          color: LEGEND_COLORS[1],
+          label: '2.5 — 5.0 kg/m³'
+        },
+        {
+          value: 5,
+          label: '5 — 7.5 kg/m³',
+          color: LEGEND_COLORS[0]
+        },
+        {
+          value: 7.5,
+          label: '7.5 — 10 kg/m³',
+          color: LEGEND_COLORS[0]
+        },
+        {
+          value: 10,
+          label: '>10 kg/m³',
+          color: LEGEND_COLORS[2]
+        }
+      ]
+    })
+  ]
 });
 
 const view = new MapView({
@@ -95,6 +103,7 @@ const view = new MapView({
 
 const locateWidget = new LocateWidget({
   view,
+
   goToOverride: (view, goToParams) => {
     view.when(() => {
       return view.goTo(goToParams.target, goToParams.options).then(() => {
@@ -126,6 +135,14 @@ const featureLayer = new FeatureLayer({
     },
     {
       name: 'capacity' as keyof Container,
+      type: 'double'
+    },
+    {
+      name: 'weight' as keyof Container,
+      type: 'double'
+    },
+    {
+      name: 'ratio' as keyof Container,
       type: 'double'
     },
     {
@@ -182,9 +199,25 @@ const featureLayer = new FeatureLayer({
     content: (point: CSVPoint<Container>) => {
       const a = point.graphic.attributes;
 
-      return `  
-        <container-history container-no="${a.containerNo}"></container-history>
-        `;
+      const dataType = $('#container-data-type').val() as DataType;
+
+      const dataByType: Record<DataType, Function> = {
+        [DataType.lastUnload]: () => {
+          return `<container-history container-no="${a.containerNo}"></container-history>`;
+        },
+        [DataType.unloadRatio]: () => {
+          return `
+            <table>
+              <tr><td>Data</td><td>${moment(a.date).format('YYYY-MM-DD')}</td></tr>
+              <tr><td>Talpa</td><td>${a.capacity} m³</td></tr>
+              <tr><td>Svoris</td><td>${a.weight} kg</td></tr>
+              <tr><td>Iškr. santykis</td><td>${Math.round(a.ratio * 100) / 100} kg/m³</td></tr>
+            </table>
+          `;
+        }
+      };
+
+      return dataByType[dataType]();
     },
     outFields: ['*']
   }

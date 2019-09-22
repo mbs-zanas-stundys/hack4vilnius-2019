@@ -6,6 +6,8 @@ import 'moment/locale/lt';
 export const api = {
   containersByCoordinates: async (lat, lon, distance): Promise<Container[]> =>
     get<ContainerDTO[]>('/containers', undefined, { lat, lon, distance }).then(c => c.map(mapContainerDto)),
+  containersLowRatio: async (): Promise<Container[]> =>
+    get<ContainerDTO[]>('/containers/low-ratio').then(c => c.map(mapContainerDto)),
   containersByAddress: (street, houseNo, flatNo) =>
     get('/containers', undefined, { street, houseNo, flatNo }).then(c => c.map(mapContainerDto)),
   containerDetails: containerNo => get<Container>('/containers/:containerNo', { containerNo }).then(mapContainerDto),
@@ -14,8 +16,10 @@ export const api = {
 };
 
 const mapContainerDto = (dto: ContainerDTO): Container => {
-  dto.history.sort((a, b) => b.date.localeCompare(a.date));
-  const lastHistoryItem: ContainerHistory | undefined = dto.history[dto.history.length - 1];
+  if (dto.history) {
+    dto.history.sort((a, b) => b.date.localeCompare(a.date));
+  }
+  const lastHistoryItem: ContainerHistory | undefined = dto.history && dto.history[dto.history.length - 1];
 
   return {
     ...dto,

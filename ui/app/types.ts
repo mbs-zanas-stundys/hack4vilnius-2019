@@ -8,6 +8,10 @@ export interface ContainerDTO {
   capacity: number;
   company: string;
   containerNo: string;
+  date: Date;
+  ratio: number;
+  weight: number;
+  garbageTruckNo: string;
   history: ContainerHistory[];
   houseNo: string;
   id: string;

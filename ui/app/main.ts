@@ -4,7 +4,7 @@ import Graphic from 'esri/Graphic';
 import { api } from './api';
 import { PROD, SEARCH_RADIUS } from './constants';
 import * as map from './map';
-import { ContainerDTO } from './types';
+import { ContainerDTO, DataType } from './types';
 import { debounce, onMapInteract, replaceMapFeatures, mapContainersToMapFeatures } from './utils';
 import './container-history';
 
@@ -70,8 +70,7 @@ btnShowButtons.click(e => {
 });
 
 dataTypeSelect.change(() => {
-  const value = dataTypeSelect.val();
-  console.log(value);
+  fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
 });
 
 if (!PROD) {
@@ -96,18 +95,42 @@ function showOverlay() {
 }
 
 function fetchFeaturesByCoords(latitude, longitude) {
-  api
-    .containersByCoordinates(
-      latitude,
-      longitude,
-      Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 2
-    )
-    .then(containers => {
-      console.log({ containers, withLocation: containers.filter(c => c.history.length) });
-      const features = mapContainersToMapFeatures(containers);
+  const value = dataTypeSelect.val() as DataType;
 
-      replaceMapFeatures(features);
-    });
+  const addLegendClasses = () => {
+    legendDiv.removeClass(Object.values(DataType).map(t => 'legend--' + t));
+    legendDiv.addClass('legend--' + value);
+  };
+
+  const dataByType: Record<DataType, Function> = {
+    [DataType.lastUnload]: () => {
+      api
+        .containersByCoordinates(
+          latitude,
+          longitude,
+          Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 2
+        )
+        .then(containers => {
+          const features = mapContainersToMapFeatures(containers);
+
+          map.featureLayer.set('renderer', map.companyRenderer);
+          replaceMapFeatures(features);
+          addLegendClasses();
+        });
+    },
+    [DataType.unloadRatio]: () => {
+      api.containersLowRatio().then(containers => {
+        const features = mapContainersToMapFeatures(containers);
+        console.log('unloadRatio', { containers });
+
+        map.featureLayer.set('renderer', map.unloadRenderer);
+        replaceMapFeatures(features);
+        addLegendClasses();
+      });
+    }
+  };
+
+  dataByType[value]();
 }
 
 map.view.when(() => {

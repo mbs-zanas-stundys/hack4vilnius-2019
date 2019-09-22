@@ -16,6 +16,7 @@ class ContainerHistoryElement extends HTMLElement {
       this.innerHTML = '<span class="loader"></span>';
 
       Promise.all([api.containerDetails(containerNo), api.containerSchedule(containerNo)]).then(([res, schedule]) => {
+        console.log(res);
         this.innerHTML = `
           <table>
             <tr><td>Gatvė</td><td>${res.street}</td></tr>
@@ -23,6 +24,7 @@ class ContainerHistoryElement extends HTMLElement {
             <tr><td>Vietovė</td><td>${res.location}</td></tr>
             <tr><td>Talpa</td><td>${res.capacity} m³</td></tr>
             <tr><td>Vežėjas</td><td>${res.company}</td></tr>
+            
             <tr><td>Pask. išvėžimas</td><td title="${res.lastUnload}">${res.lastUnloadWords}</td></tr>
             <tr><td>Sekantys vėžimai</td><td>${
               schedule.length

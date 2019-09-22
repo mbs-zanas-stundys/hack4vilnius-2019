@@ -370,3 +370,12 @@ button.secondary:hover {
 .esri-legend__layer-caption {
   display: none;
 }
+
+.esri-legend__layer-table {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.legend--unload-ratio .esri-legend__layer-table.esri-legend__layer-table--size-ramp:first-child {
+  display: none;
+}
