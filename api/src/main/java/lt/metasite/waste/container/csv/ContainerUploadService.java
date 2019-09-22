@@ -84,4 +84,9 @@ public class ContainerUploadService implements CsvUploadService {
     public String getFilePattern() {
         return "Konteineriu sarasas";
     }
+
+    @Override
+    public int getOrder() {
+        return 2;
+    }
 }

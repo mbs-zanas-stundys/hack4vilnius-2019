@@ -8,4 +8,5 @@ public interface CsvUploadService {
 
     String getFilePattern();
 
+    int getOrder();
 }
