@@ -2,6 +2,7 @@ package lt.metasite.waste.container;
 
 import java.util.List;
 
+import lt.metasite.waste.container.dto.ContainerFlatListDto;
 import lt.metasite.waste.container.repository.WasteContainerRepository;
 
 import org.springframework.stereotype.Service;
@@ -38,5 +39,9 @@ public class ContainerService {
 
     public List<PickupHistory> getPickupHistory(String containerNo){
         return repository.getPickupHistory(containerNo);
+    }
+
+    public List<ContainerFlatListDto> getLowRatioContainers(){
+        return repository.getLowRationContainers();
     }
 }

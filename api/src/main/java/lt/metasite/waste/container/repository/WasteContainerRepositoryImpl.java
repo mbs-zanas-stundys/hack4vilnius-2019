@@ -5,11 +5,13 @@ import java.util.List;
 
 import lt.metasite.waste.container.Container;
 import lt.metasite.waste.container.PickupHistory;
+import lt.metasite.waste.container.dto.ContainerFlatListDto;
 
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.NearQuery;
@@ -17,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.geoNear;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
@@ -175,6 +178,28 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
         return mongoTemplate.aggregate(aggregation,PickupHistory.class).getMappedResults();
     }
 
-
+    @Override
+    public List<ContainerFlatListDto> getLowRationContainers() {
+        List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(unwind("history"));
+        operations.add(project().and("history.weight").divide("capacity").as("ratio")
+                                .and("containerNo").as("containerNo")
+                                .and("position").as("position")
+                                .and("street").as("street")
+                                .and("company").as("company")
+                                .and("location").as("location")
+                                .and("houseNo").as("houseNo")
+                                .and("capacity").as("capacity")
+                                .and("history.date").as("date")
+                                .and("history.garbageTruckRegNo").as("garbageTruckRegNo")
+                                .and("history.weight").as("weight")
+        );
+        operations.add(match(Criteria.where("ratio").lte(10D)));
+        TypedAggregation<Container> aggregation =
+                newAggregation(Container.class,
+                               operations
+                );
+        return mongoTemplate.aggregate(aggregation, ContainerFlatListDto.class).getMappedResults();
+    }
 
 }

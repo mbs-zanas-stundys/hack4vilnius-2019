@@ -3,6 +3,9 @@ package lt.metasite.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
+import lt.metasite.waste.container.dto.ContainerFlatListDto;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +58,17 @@ public class ContainerController {
     @GetMapping("/{containerNo}/history")
     public List<PickupHistory> getContainerPickupHistory(@PathVariable String containerNo){
         return service.getPickupHistory(containerNo);
+    }
+
+    @GetMapping("/schedules/delayed")
+    public List<Schedule> getMissedContainers(){
+        return scheduleService.getDelayedSchedules();
+    }
+
+
+    @GetMapping("/low-ratio")
+    public List<ContainerFlatListDto> lowRatioContainers(){
+        return service.getLowRatioContainers();
     }
 
 }

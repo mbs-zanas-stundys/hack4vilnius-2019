@@ -24,5 +24,10 @@ public class ScheduleService {
                                                                     dateTo);
     }
 
+    public List<Schedule> getDelayedSchedules(){
+        return  repository.getDelayedSchedules(LocalDate.now().withDayOfMonth(1),
+                                               LocalDate.now().plusMonths(1).withDayOfMonth(1).minusDays(1));
+    }
+
 
 }
