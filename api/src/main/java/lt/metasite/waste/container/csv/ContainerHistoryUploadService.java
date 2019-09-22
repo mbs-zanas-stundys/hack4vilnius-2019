@@ -58,10 +58,7 @@ public class ContainerHistoryUploadService implements CsvUploadService {
 
             StreamSupport.stream(csvToBean.spliterator(), true)
                          .map(this::fromCsv)
-                         .peek(p -> repository.pushHistory(p.getFirst(), p.getSecond()))
-                         .forEach(p -> scheduleRepository.setNearestScheduleToCompleted(p.getSecond()
-                                                                                         .getDate(),
-                                                                                        p.getFirst()));
+                         .forEach(p -> repository.pushHistory(p.getFirst(), p.getSecond()));
 
             LOGGER.info("Upload finished");
         } catch (IOException e) {

@@ -26,6 +26,7 @@ public class Container {
     private Double capacity;
     private List<PickupHistory> history = new ArrayList<>();
 
+
     public Double getCapacity() {
         return capacity;
     }

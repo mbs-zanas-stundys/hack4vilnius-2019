@@ -1,19 +1,29 @@
 package lt.metasite.waste.container;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import lt.metasite.waste.container.dto.ContainerDto;
 import lt.metasite.waste.container.dto.ContainerFlatListDto;
 import lt.metasite.waste.container.repository.WasteContainerRepository;
 
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ContainerService {
     private final WasteContainerRepository repository;
+    private final ScheduleService scheduleService;
 
     public ContainerService(
-            WasteContainerRepository repository) {
+            WasteContainerRepository repository,
+            ScheduleService scheduleService) {
         this.repository = repository;
+        this.scheduleService = scheduleService;
     }
 
     public String save(){
@@ -43,5 +53,32 @@ public class ContainerService {
 
     public List<ContainerFlatListDto> getLowRatioContainers(){
         return repository.getLowRationContainers();
+    }
+
+    public List<ContainerDto> getDelayedContainersForDate(LocalDate date){
+        return scheduleService.getScheduleForDate(date)
+        .stream()
+        .map(i-> Optional.ofNullable(repository.findByContainerNo(i.getContainerNo()))
+                .map(a->toDto(a,i))
+        .orElse(null))
+                              .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+    }
+
+    private ContainerDto toDto(Container container, Schedule schedule){
+        ContainerDto dto = new ContainerDto();
+        dto.setContainerNo(container.getContainerNo());
+        dto.setPosition(container.getPosition());
+        dto.setStreet(container.getStreet());
+        dto.setCompany(container.getCompany());
+        dto.setLocation(container.getLocation());
+        dto.setHouseNo(container.getHouseNo());
+        dto.setCapacity(container.getCapacity());
+        dto.setMissedPickUp(container.getHistory().stream()
+                                     .map(PickupHistory::getDate)
+                                     .map(LocalDateTime::toLocalDate)
+                                     .noneMatch(i->i.equals(schedule.getExpectedDate()))
+                                      );
+        return dto;
     }
 }

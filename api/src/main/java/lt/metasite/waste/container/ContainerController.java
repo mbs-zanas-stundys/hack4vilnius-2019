@@ -1,8 +1,10 @@
 package lt.metasite.waste.container;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import lt.metasite.waste.container.dto.ContainerDto;
 import lt.metasite.waste.container.dto.ContainerFlatListDto;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,9 +62,10 @@ public class ContainerController {
         return service.getPickupHistory(containerNo);
     }
 
-    @GetMapping("/schedules/delayed")
-    public List<Schedule> getMissedContainers(){
-        return scheduleService.getDelayedSchedules();
+    @GetMapping("/delayed")
+    public List<ContainerDto> getMissedContainers(@RequestParam  @DateTimeFormat(iso =
+            DateTimeFormat.ISO.DATE) LocalDate date){
+        return service.getDelayedContainersForDate(date);
     }
 
 
