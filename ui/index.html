@@ -19,13 +19,21 @@
 
     <div class="actions-overlay hide">
       <div id="legendDiv" class="hide">
-        <h3>Konteinerių duomenys</h3>
+        <h2>Konteinerių duomenys</h2>
+        <div class="custom-select">
+          <select name="container-data-type" id="container-data-type">
+            <option value="last-unload" selected>Paskutinis išvėžimas</option>
+            <option value="unload-ratio">Iškrovimų santykis</option>
+          </select>
+        </div>
         <!-- Rūšiuoti pagal paskutinį išvežimą<br />
         Rūšiuoti pagal išvežimo dažnį<br />
         Rūšiuoti pagal išvežamą svorį<br /> -->
         <div id="legendContentDiv"></div>
+        <button style="margin: 0; margin-top: 0.5rem; width: 100%" class="primary" id="btn-show-menu" type="button">
+          Grįžti į meniu
+        </button>
       </div>
-      <button class="primary" id="btn-show-menu" type="button">Grįžti į meniu</button>
     </div>
     <section class="overlay">
       <div class="overlay-content">

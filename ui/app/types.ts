@@ -36,3 +36,8 @@ export interface Schedule {
   actualDate?: string;
   completed?: boolean;
 }
+
+export enum DataType {
+  lastUnload = 'last-unload',
+  unloadRatio = 'unload-ratio'
+}

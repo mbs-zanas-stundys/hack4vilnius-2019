@@ -16,31 +16,31 @@ const map = new EsriMap({
 const symbols = defaultSymbol.clone();
 symbols.set('color', 'green');
 
-const renderer = new UniqueValueRenderer({
-  field: 'lastUnloadDays' as keyof Container,
+const companyRenderer = new UniqueValueRenderer({
+  field: 'company' as keyof Container,
   legendOptions: {
     title: 'Paskutinis išvežimas'
   },
   defaultLabel: 'Nežinoma',
   uniqueValueInfos: [
+    // {
+    //   value: 'Nežinoma',
+    //   label: 'Nežinoma',
+    //   symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[2])
+    // },
     {
-      value: 'Nežinoma',
-      label: 'Nežinoma',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[2])
-    },
-    {
-      value: 1,
-      label: 'Vakar',
+      value: 'VSA Vilnius',
+      label: 'VSA Vilnius',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
     },
     {
-      value: 2,
-      label: 'Prieš 2 dienas',
+      value: 'Ekonovus',
+      label: 'Ekonovus',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1])
     },
     {
-      value: 3,
-      label: 'Prieš 3+ dienas',
+      value: 'Ecoservice',
+      label: 'Ecoservice',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
     }
   ]
@@ -83,6 +83,9 @@ const view = new MapView({
   map: map,
   container: 'viewDiv',
   center: START_COORDINATES,
+  ui: {
+    components: []
+  },
   zoom: 16,
   constraints: {
     minZoom: 14,
@@ -91,7 +94,14 @@ const view = new MapView({
 });
 
 const locateWidget = new LocateWidget({
-  view
+  view,
+  goToOverride: (view, goToParams) => {
+    view.when(() => {
+      return view.goTo(goToParams.target, goToParams.options).then(() => {
+        view.emit('locate', goToParams);
+      });
+    });
+  }
 });
 
 const legendWidget = new LegendWidget({
@@ -100,7 +110,7 @@ const legendWidget = new LegendWidget({
 });
 
 const featureLayer = new FeatureLayer({
-  renderer,
+  renderer: companyRenderer,
   geometryType: 'point',
   visible: true,
   objectIdField: 'id' as keyof Container,
@@ -171,7 +181,7 @@ const featureLayer = new FeatureLayer({
     },
     content: (point: CSVPoint<Container>) => {
       const a = point.graphic.attributes;
-      console.log({ a });
+
       return `  
         <container-history container-no="${a.containerNo}"></container-history>
         `;
@@ -195,7 +205,5 @@ view.on('click', clickEvent => {
     longitude: clickEvent.mapPoint.longitude
   });
 });
-
-locateWidget.on('click', () => console.log('locateWidget'));
 
 export { view, map, featureLayer, locateWidget };

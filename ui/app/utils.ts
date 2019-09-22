@@ -52,6 +52,9 @@ export const onMapInteract = callback => {
   view.on('resize ', () => {
     callback();
   });
+  view.on('locate', () => {
+    callback();
+  });
 };
 
 export const replaceMapFeatures = (features: Graphic[]) => {

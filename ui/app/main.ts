@@ -20,6 +20,7 @@ const btnShowMap = $('#btn-show-map')!;
 const btnShowButtons = $('#btn-show-buttons')!;
 const legendDiv = $('#legendDiv')!;
 const btnSubmitAddress = $('#btn-submit-address')!;
+const dataTypeSelect = $('#container-data-type')!;
 
 btnFindLocation.click(e => {
   e.preventDefault();
@@ -68,6 +69,11 @@ btnShowButtons.click(e => {
   overlayForm.addClass('d-none');
 });
 
+dataTypeSelect.change(() => {
+  const value = dataTypeSelect.val();
+  console.log(value);
+});
+
 if (!PROD) {
   map.view.when(() => {
     btnShowMap.click();
@@ -82,6 +88,7 @@ function hideOverlay() {
     btnFindLocation.removeClass('loading');
   }, 300);
 }
+
 function showOverlay() {
   legendDiv.addClass('hide');
   actionsOverlay.addClass('hide');
@@ -93,16 +100,18 @@ function fetchFeaturesByCoords(latitude, longitude) {
     .containersByCoordinates(
       latitude,
       longitude,
-      Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 3.14
+      Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 2
     )
     .then(containers => {
       console.log({ containers, withLocation: containers.filter(c => c.history.length) });
       const features = mapContainersToMapFeatures(containers);
 
       replaceMapFeatures(features);
-
-      onMapInteract(() => {
-        debouncedFetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
-      });
     });
 }
+
+map.view.when(() => {
+  onMapInteract(() => {
+    debouncedFetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
+  });
+});
