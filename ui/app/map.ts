@@ -5,17 +5,10 @@ import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
 import LegendWidget from 'esri/widgets/Legend';
 import LocateWidget from 'esri/widgets/Locate';
+import moment from 'moment';
 
 import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from './constants';
 import { Container, CSVPoint, DataType } from './types';
-import moment from 'moment';
-
-const map = new EsriMap({
-  basemap: 'topo-vector'
-});
-
-const symbols = defaultSymbol.clone();
-symbols.set('color', 'green');
 
 export const companyRenderer = new UniqueValueRenderer({
   field: 'company' as keyof Container,
@@ -87,6 +80,30 @@ export const unloadRenderer = new UniqueValueRenderer({
   ]
 });
 
+export const missedUnloadRenderer = new UniqueValueRenderer({
+  field: 'missedPickup' as keyof Container,
+  legendOptions: {
+    title: 'Praleisti vėžimai'
+  },
+  uniqueValueInfos: [
+    // {
+    //   value: 'false',
+    //   label: 'Nepraleista',
+    //   symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+    // },
+    {
+      value: 'true',
+      label: 'Praleista',
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+    }
+  ]
+  // defaultSymbol: defaultSymbol.clone()
+});
+
+const map = new EsriMap({
+  basemap: 'streets-navigation-vector'
+});
+
 const view = new MapView({
   map: map,
   container: 'viewDiv',
@@ -102,15 +119,15 @@ const view = new MapView({
 });
 
 const locateWidget = new LocateWidget({
-  view,
+  view
 
-  goToOverride: (view, goToParams) => {
-    view.when(() => {
-      return view.goTo(goToParams.target, goToParams.options).then(() => {
-        view.emit('locate', goToParams);
-      });
-    });
-  }
+  // goToOverride: (view, goToParams) => {
+  //   view.when(() => {
+  //     return view.goTo(goToParams.target, goToParams.options).then(() => {
+  //       view.emit('locate', goToParams);
+  //     });
+  //   });
+  // }
 });
 
 const legendWidget = new LegendWidget({
@@ -204,6 +221,9 @@ const featureLayer = new FeatureLayer({
       const dataByType: Record<DataType, Function> = {
         [DataType.lastUnload]: () => {
           return `<container-history container-no="${a.containerNo}"></container-history>`;
+        },
+        [DataType.missedPickups]: () => {
+          return `TODO`;
         },
         [DataType.unloadRatio]: () => {
           return `

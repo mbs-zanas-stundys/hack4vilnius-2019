@@ -8,9 +8,13 @@ export const api = {
     get<ContainerDTO[]>('/containers', undefined, { lat, lon, distance }).then(c => c.map(mapContainerDto)),
   containersLowRatio: async (): Promise<Container[]> =>
     get<ContainerDTO[]>('/containers/low-ratio').then(c => c.map(mapContainerDto)),
+  containersMissedPickups: async (): Promise<Container[]> =>
+    get<ContainerDTO[]>('/containers/missed-unloads')
+      .then(c => c.map(mapContainerDto))
+      .catch(() => []),
   containersByAddress: (street, houseNo, flatNo) =>
-    get('/containers', undefined, { street, houseNo, flatNo }).then(c => c.map(mapContainerDto)),
-  containerDetails: containerNo => get<Container>('/containers/:containerNo', { containerNo }).then(mapContainerDto),
+    get<ContainerDTO[]>('/containers', undefined, { street, houseNo, flatNo }).then(c => c.map(mapContainerDto)),
+  containerDetails: containerNo => get<ContainerDTO>('/containers/:containerNo', { containerNo }).then(mapContainerDto),
   containerHistory: containerNo => get('/containers/:containerNo/history', { containerNo }),
   containerSchedule: containerNo => get<Schedule[]>('/containers/:containerNo/schedules ', { containerNo })
 };
@@ -23,6 +27,7 @@ const mapContainerDto = (dto: ContainerDTO): Container => {
 
   return {
     ...dto,
+    missedPickup: typeof dto.missedPickup === 'boolean' ? String(dto.missedPickup) : '',
     lastUnload: lastHistoryItem ? moment(lastHistoryItem.date).format('YYYY-MM-DD HH:mm') : 'Nežinoma',
     lastUnloadWords: lastHistoryItem
       ? `${moment(lastHistoryItem.date).fromNow()}, ${moment(lastHistoryItem.date).format('dddd')}`

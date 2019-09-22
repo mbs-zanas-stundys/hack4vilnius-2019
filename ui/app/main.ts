@@ -127,6 +127,15 @@ function fetchFeaturesByCoords(latitude, longitude) {
         replaceMapFeatures(features);
         addLegendClasses();
       });
+    },
+    [DataType.missedPickups]: () => {
+      api.containersMissedPickups().then(containers => {
+        const features = mapContainersToMapFeatures(containers);
+
+        map.featureLayer.set('renderer', map.missedUnloadRenderer);
+        replaceMapFeatures(features);
+        addLegendClasses();
+      });
     }
   };
 

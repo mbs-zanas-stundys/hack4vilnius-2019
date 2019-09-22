@@ -18,12 +18,14 @@ export interface ContainerDTO {
   location: string;
   position: { x: number; y: number; type: 'Point'; coordinates: [number, number] };
   street: string;
+  missedPickup?: boolean;
 }
 
-export interface Container extends ContainerDTO {
+export interface Container extends Omit<ContainerDTO, 'missedPickup'> {
   lastUnload: string;
   lastUnloadWords: string;
   lastUnloadDays: number | string;
+  missedPickup?: string;
 }
 
 export interface CSVPoint<T> {
@@ -43,5 +45,6 @@ export interface Schedule {
 
 export enum DataType {
   lastUnload = 'last-unload',
-  unloadRatio = 'unload-ratio'
+  unloadRatio = 'unload-ratio',
+  missedPickups = 'missed-pickups'
 }
