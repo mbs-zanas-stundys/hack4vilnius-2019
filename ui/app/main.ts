@@ -102,6 +102,16 @@ function fetchFeaturesByCoords(latitude, longitude) {
     legendDiv.addClass('legend--' + value);
   };
 
+  const startLoading = () => {
+    legendDiv.addClass('legend--loading');
+  };
+
+  const stopLoading = () => {
+    legendDiv.removeClass('legend--loading');
+  };
+
+  startLoading();
+
   const dataByType: Record<DataType, Function> = {
     [DataType.lastUnload]: () => {
       api
@@ -116,6 +126,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
           map.featureLayer.set('renderer', map.companyRenderer);
           replaceMapFeatures(features);
           addLegendClasses();
+          stopLoading();
         });
     },
     [DataType.unloadRatio]: () => {
@@ -126,15 +137,17 @@ function fetchFeaturesByCoords(latitude, longitude) {
         map.featureLayer.set('renderer', map.unloadRenderer);
         replaceMapFeatures(features);
         addLegendClasses();
+        stopLoading();
       });
     },
     [DataType.missedPickups]: () => {
       api.containersMissedPickups().then(containers => {
         const features = mapContainersToMapFeatures(containers);
 
-        map.featureLayer.set('renderer', map.missedUnloadRenderer);
+        map.featureLayer.set('renderer', map.missedPickUpRenderer);
         replaceMapFeatures(features);
         addLegendClasses();
+        stopLoading();
       });
     }
   };
@@ -144,6 +157,9 @@ function fetchFeaturesByCoords(latitude, longitude) {
 
 map.view.when(() => {
   onMapInteract(() => {
-    debouncedFetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
+    const value = dataTypeSelect.val() as DataType;
+    if (value === DataType.lastUnload) {
+      debouncedFetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
+    }
   });
 });

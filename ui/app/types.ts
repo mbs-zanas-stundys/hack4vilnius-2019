@@ -8,24 +8,24 @@ export interface ContainerDTO {
   capacity: number;
   company: string;
   containerNo: string;
+  houseNo: string;
   date: Date;
   ratio: number;
   weight: number;
   garbageTruckNo: string;
   history: ContainerHistory[];
-  houseNo: string;
   id: string;
   location: string;
   position: { x: number; y: number; type: 'Point'; coordinates: [number, number] };
   street: string;
-  missedPickup?: boolean;
+  missedPickUp?: boolean;
 }
 
-export interface Container extends Omit<ContainerDTO, 'missedPickup'> {
+export interface Container extends Omit<ContainerDTO, 'missedPickUp'> {
   lastUnload: string;
   lastUnloadWords: string;
   lastUnloadDays: number | string;
-  missedPickup?: string;
+  missedPickUp?: string;
 }
 
 export interface CSVPoint<T> {

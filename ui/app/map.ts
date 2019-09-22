@@ -9,6 +9,7 @@ import moment from 'moment';
 
 import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from './constants';
 import { Container, CSVPoint, DataType } from './types';
+import { SimpleRenderer } from 'esri/renderers';
 
 export const companyRenderer = new UniqueValueRenderer({
   field: 'company' as keyof Container,
@@ -80,17 +81,17 @@ export const unloadRenderer = new UniqueValueRenderer({
   ]
 });
 
-export const missedUnloadRenderer = new UniqueValueRenderer({
-  field: 'missedPickup' as keyof Container,
+export const missedPickUpRenderer = new UniqueValueRenderer({
+  field: 'missedPickUp' as keyof Container,
   legendOptions: {
     title: 'Praleisti vėžimai'
   },
   uniqueValueInfos: [
-    // {
-    //   value: 'false',
-    //   label: 'Nepraleista',
-    //   symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
-    // },
+    {
+      value: 'false',
+      label: 'Nepraleista',
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
+    },
     {
       value: 'true',
       label: 'Praleista',
@@ -136,7 +137,7 @@ const legendWidget = new LegendWidget({
 });
 
 const featureLayer = new FeatureLayer({
-  renderer: companyRenderer,
+  renderer: new SimpleRenderer(),
   geometryType: 'point',
   visible: true,
   objectIdField: 'id' as keyof Container,
@@ -148,6 +149,10 @@ const featureLayer = new FeatureLayer({
     },
     {
       name: 'containerNo' as keyof Container,
+      type: 'string'
+    },
+    {
+      name: 'missedPickUp' as keyof Container,
       type: 'string'
     },
     {
@@ -223,7 +228,7 @@ const featureLayer = new FeatureLayer({
           return `<container-history container-no="${a.containerNo}"></container-history>`;
         },
         [DataType.missedPickups]: () => {
-          return `TODO`;
+          return `<container-history container-no="${a.containerNo}"></container-history>`;
         },
         [DataType.unloadRatio]: () => {
           return `
