@@ -1,4 +1,4 @@
-package lt.metasite.waste.container;
+package lt.metasite.waste.container.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,10 +11,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.stream.StreamSupport;
 
+import lt.metasite.waste.container.PickupHistory;
+import lt.metasite.waste.container.repository.WasteContainerRepository;
 import lt.metasite.waste.container.dto.PickupHistoryCsvDto;
-import lt.metasite.waste.container.schedule.ScheduleRepository;
-import lt.metasite.waste.csv.CsvUploadService;
+import lt.metasite.waste.container.repository.ScheduleRepository;
+import lt.metasite.waste.commo.CsvUploadService;
+import lt.metasite.waste.system.GitService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,9 @@ import com.opencsv.bean.CsvToBeanBuilder;
 public class ContainerHistoryUploadService implements CsvUploadService {
     private final WasteContainerRepository repository;
     private final ScheduleRepository scheduleRepository;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerHistoryUploadService.class);
+
 
 
     public ContainerHistoryUploadService(
@@ -41,6 +49,7 @@ public class ContainerHistoryUploadService implements CsvUploadService {
                         new BufferedReader(new FileReader(new File(pathToFile.toString()),
                                                           Charset.forName("Windows-1257")));
         ) {
+            LOGGER.info("Upload started");
             CsvToBean<PickupHistoryCsvDto> csvToBean = new CsvToBeanBuilder<PickupHistoryCsvDto>(reader)
                     .withType(PickupHistoryCsvDto.class)
                     .withSeparator(';')
@@ -54,9 +63,9 @@ public class ContainerHistoryUploadService implements CsvUploadService {
                                                                                          .getDate(),
                                                                                         p.getFirst()));
 
-
+            LOGGER.info("Upload finished");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Unknown error: ",e);
         }
 
     }
@@ -67,7 +76,7 @@ public class ContainerHistoryUploadService implements CsvUploadService {
     }
 
 
-    private Pair<String,PickupHistory> fromCsv(PickupHistoryCsvDto csvDto){
+    private Pair<String, PickupHistory> fromCsv(PickupHistoryCsvDto csvDto){
         PickupHistory history = new PickupHistory();
         history.setWeight(csvDto.getWeight());
         history.setGarbageTruckRegNo(csvDto.getGarbageTruckRegNo());

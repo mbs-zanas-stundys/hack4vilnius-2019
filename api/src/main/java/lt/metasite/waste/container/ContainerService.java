@@ -2,6 +2,8 @@ package lt.metasite.waste.container;
 
 import java.util.List;
 
+import lt.metasite.waste.container.repository.WasteContainerRepository;
+
 import org.springframework.stereotype.Service;
 
 @Service

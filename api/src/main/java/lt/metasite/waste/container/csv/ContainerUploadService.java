@@ -1,4 +1,4 @@
-package lt.metasite.waste.container;
+package lt.metasite.waste.container.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,14 +7,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import lt.metasite.waste.container.Container;
+import lt.metasite.waste.container.repository.WasteContainerRepository;
 import lt.metasite.waste.container.dto.ContainerCsvDto;
-import lt.metasite.waste.csv.CsvUploadService;
+import lt.metasite.waste.commo.CsvUploadService;
+import lt.metasite.waste.system.GitService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,8 @@ import com.opencsv.bean.CsvToBeanBuilder;
 public class ContainerUploadService implements CsvUploadService {
 
     private final WasteContainerRepository repository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerUploadService.class);
+
 
     public ContainerUploadService(WasteContainerRepository repository) {
         this.repository = repository;
@@ -37,6 +43,7 @@ public class ContainerUploadService implements CsvUploadService {
                             new BufferedReader(new FileReader(new File(pathToFile.toString()),
                                                               Charset.forName("Windows-1257")));
             ) {
+                LOGGER.info("Upload started");
                 CsvToBean<ContainerCsvDto> csvToBean = new CsvToBeanBuilder<ContainerCsvDto>(reader)
                         .withType(ContainerCsvDto.class)
                         .withSeparator(';')
@@ -54,9 +61,9 @@ public class ContainerUploadService implements CsvUploadService {
              repository.saveAll(list.stream()
                                                     .filter(c-> !existingContainers.contains(c.getContainerNo()))
                                                     .collect(Collectors.toList()));
-
+             LOGGER.info("Upload finished");
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Unkown error", e);
             }
 
     }

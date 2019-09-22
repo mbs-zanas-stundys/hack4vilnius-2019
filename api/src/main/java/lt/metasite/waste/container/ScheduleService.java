@@ -1,8 +1,9 @@
-package lt.metasite.waste.container.schedule;
+package lt.metasite.waste.container;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+
+import lt.metasite.waste.container.repository.ScheduleRepository;
 
 import org.springframework.stereotype.Service;
 

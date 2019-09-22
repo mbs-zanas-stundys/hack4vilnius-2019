@@ -1,6 +1,5 @@
-package lt.metasite.waste.csv;
+package lt.metasite.waste.system;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,10 +7,9 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import lt.metasite.waste.commo.CsvUploadService;
+
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +18,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class GitService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GitService.class);
-    private static final String GIT_URL = "https://github.com/vilnius/atlieku-tvarkymas";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitService.class);
     private final List<CsvUploadService> serviceList;
     @Value("${git-download.enabled}")
     private boolean enabled;
+
+    @Value("${git-download.url}")
+    private String gitUrl;
 
     public GitService(List<CsvUploadService> services) {
         this.serviceList = services;
@@ -35,14 +35,13 @@ public class GitService {
         if(!enabled){
             return;
         }
-//        Path tempDir = Files.createTempDirectory("waste");
-        Path tempDir = Path.of("/tmp/waste9631168670229141023");
+        Path tempDir = Files.createTempDirectory("waste");
         try {
-            System.out.println("Cloning " + GIT_URL + " into " + tempDir.toString());
-//            Git.cloneRepository()
-//               .setURI(GIT_URL)
-//               .setDirectory(tempDir.toFile())
-//               .call();
+            LOGGER.info("Cloning " + gitUrl + " into " + tempDir.toString());
+            Git.cloneRepository()
+               .setURI(gitUrl)
+               .setDirectory(tempDir.toFile())
+               .call();
 
             Files.walk(tempDir)
                  .filter(f -> f.toString().endsWith(".csv"))
