@@ -88,11 +88,6 @@ export const missedPickUpRenderer = new UniqueValueRenderer({
   },
   uniqueValueInfos: [
     {
-      value: 'Nežinoma',
-      label: 'Nežinoma',
-      symbol: defaultSymbol.clone().set('color', '#ccc')
-    },
-    {
       value: 'false',
       label: 'Nepraleista',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
@@ -101,6 +96,11 @@ export const missedPickUpRenderer = new UniqueValueRenderer({
       value: 'true',
       label: 'Praleista',
       symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+    },
+    {
+      value: 'Nežinoma',
+      label: 'Nežinoma',
+      symbol: defaultSymbol.clone().set('color', '#ccc')
     }
   ]
   // defaultSymbol: defaultSymbol.clone()
