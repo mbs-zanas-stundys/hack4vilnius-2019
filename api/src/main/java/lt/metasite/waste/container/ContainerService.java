@@ -3,10 +3,7 @@ package lt.metasite.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.dto.ContainerListView;
-import lt.metasite.waste.container.dto.ContainerView;
-import lt.metasite.waste.container.dto.MissedPickupContainerView;
-import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
+import lt.metasite.waste.container.dto.*;
 import lt.metasite.waste.container.repository.WasteContainerRepository;
 
 import org.springframework.stereotype.Service;
@@ -44,8 +41,8 @@ public class ContainerService {
         return repository.getLowRationContainers(date);
     }
 
-    public List<MissedPickupContainerView> getDelayedContainersForDate(LocalDate date) {
-        return repository.getMissedPickupContainers(date);
+    public List<ContainerForDateView> pickupsForDate(LocalDate date) {
+        return repository.scheduledPickupContainers(date);
     }
 
 }

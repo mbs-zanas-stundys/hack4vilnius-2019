@@ -3,10 +3,7 @@ package lt.metasite.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.dto.ContainerListView;
-import lt.metasite.waste.container.dto.ContainerView;
-import lt.metasite.waste.container.dto.MissedPickupContainerView;
-import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
+import lt.metasite.waste.container.dto.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,13 +53,13 @@ public class ContainerController {
         return service.getPickupHistory(containerNo, date);
     }
 
-    @GetMapping("/delayed")
-    public List<MissedPickupContainerView> getMissedContainers(@RequestParam(required = false) @DateTimeFormat(iso =
+    @GetMapping("/pickup")
+    public List<ContainerForDateView> getMissedContainers(@RequestParam(required = false) @DateTimeFormat(iso =
             DateTimeFormat.ISO.DATE) LocalDate date) {
         if(date == null){
             date = LocalDate.now();
         }
-        return service.getDelayedContainersForDate(date);
+        return service.pickupsForDate(date);
     }
 
 

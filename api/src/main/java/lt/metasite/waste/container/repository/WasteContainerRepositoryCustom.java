@@ -3,12 +3,8 @@ package lt.metasite.waste.container.repository;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.Container;
 import lt.metasite.waste.container.Pickup;
-import lt.metasite.waste.container.dto.ContainerListView;
-import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
-import lt.metasite.waste.container.dto.ContainerView;
-import lt.metasite.waste.container.dto.MissedPickupContainerView;
+import lt.metasite.waste.container.dto.*;
 
 public interface WasteContainerRepositoryCustom {
 
@@ -22,5 +18,5 @@ public interface WasteContainerRepositoryCustom {
 
     List<ContainerPickupHistoryView> getLowRationContainers(LocalDate date);
 
-    List<MissedPickupContainerView> getMissedPickupContainers(LocalDate date);
+    List<ContainerForDateView> scheduledPickupContainers(LocalDate date);
 }
