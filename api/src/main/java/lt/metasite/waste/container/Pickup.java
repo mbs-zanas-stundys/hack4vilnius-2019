@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Pickup {
+    private Long externalId;
     private LocalDateTime date;
     private String garbageTruckRegNo;
     private Double weight;
@@ -31,5 +32,13 @@ public class Pickup {
 
     public void setWeight(Double weight) {
         this.weight = weight;
+    }
+
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 }

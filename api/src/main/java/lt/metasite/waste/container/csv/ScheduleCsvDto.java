@@ -8,7 +8,7 @@ import com.opencsv.bean.CsvDate;
 public class ScheduleCsvDto {
 
     @CsvBindByName(column = "Isvezimo plano ID")
-    private String externalId;
+    private Long externalId;
 
     @CsvBindByName(column = "Konteinerio Nr")
     private String containerNo;
@@ -44,11 +44,11 @@ public class ScheduleCsvDto {
         this.company = company;
     }
 
-    public String getExternalId() {
+    public Long getExternalId() {
         return externalId;
     }
 
-    public void setExternalId(String externalId) {
+    public void setExternalId(Long externalId) {
         this.externalId = externalId;
     }
 }

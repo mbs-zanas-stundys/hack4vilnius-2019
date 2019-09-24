@@ -11,9 +11,11 @@ import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
 
 import lt.metasite.waste.container.dto.ContainerView;
 import lt.metasite.waste.container.dto.MissedPickupContainerView;
+import org.bson.Document;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -197,20 +199,22 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
     public List<MissedPickupContainerView> getMissedPickupContainers(LocalDate date) {
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(match(Criteria.where("schedule.date").is(date.withDayOfMonth(1))));
-        operations.add(match(Criteria.where("schedule.schedules.date").is(date)));
         operations.add(unwind("schedule"));
         operations.add(unwind("schedule.schedules"));
+        operations.add(match(Criteria.where("schedule.schedules.expectedDate").is(date)));
         operations.add(unwind("history"));
         operations.add(unwind("history.pickups"));
         operations.add(project()
-                        .and("containerNo").as("containerNo")
-                        .and("location").as("location")
-                        .and("history.pickups.date").as("date")
-                        .and(dateOf("history.pickups.date").toString("%Y-%m-%d")).as("date")
-                        .and("history.pickups.garbageTruckRegNo").as("garbageTruckRegNo")
-                        .and("history.pickups.weight").as("weight")
-                        .and(dateOf("schedule.schedules.expectedDate").toString("%Y-%m-%d")).as("expectedDate")
+                .and("containerNo").as("containerNo")
+                .and("position").as("position")
+                .and("history.pickups.date").as("date")
+                .and(dateOf("history.pickups.date").toString("%Y-%m-%d")).as("date")
+                .and("history.pickups.garbageTruckRegNo").as("garbageTruckRegNo")
+                .and("history.pickups.weight").as("weight")
+                .and(dateOf("schedule.schedules.expectedDate").toString("%Y-%m-%d")).as("expectedDate")
         );
+
+        operations.add(match(Criteria.where("date").ne("2019-09-23")));
         TypedAggregation<Container> aggregation =
                 newAggregation(Container.class,
                         operations

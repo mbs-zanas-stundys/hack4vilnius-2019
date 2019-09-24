@@ -73,6 +73,7 @@ public class ContainerHistoryUploadService implements CsvUploadService {
         history.setGarbageTruckRegNo(csvDto.getGarbageTruckRegNo());
         history.setDate(LocalDateTime.ofInstant(csvDto.getDate().toInstant(),
                 ZoneId.systemDefault()));
+        history.setExternalId(csvDto.getExternalId());
         return Pair.of(csvDto.getContainerNo(), history);
 
     }

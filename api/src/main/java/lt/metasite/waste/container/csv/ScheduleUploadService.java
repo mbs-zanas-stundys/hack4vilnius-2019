@@ -88,6 +88,7 @@ public class ScheduleUploadService implements CsvUploadService {
     private Schedule fromCsv(ScheduleCsvDto csvDto){
         Schedule schedule = new Schedule();
         schedule.setExpectedDate(LocalDate.ofInstant(csvDto.getExpectedDate().toInstant(), ZoneId.systemDefault()));
+        schedule.setExternalId(csvDto.getExternalId());
         return schedule;
     }
 }
