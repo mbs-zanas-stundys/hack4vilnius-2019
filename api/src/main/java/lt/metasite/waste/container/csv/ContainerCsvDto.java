@@ -1,8 +1,8 @@
-package lt.metasite.waste.container.dto;
+package lt.metasite.waste.container.csv;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class    ContainerCsvDto {
+public class ContainerCsvDto {
     @CsvBindByName(column = "Konteinerio Nr")
     private String containerNo;
     @CsvBindByName(column = "Konteinerio longitude")

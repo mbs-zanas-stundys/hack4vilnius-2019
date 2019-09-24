@@ -1,14 +1,19 @@
 package lt.metasite.waste.container;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.Collections.singletonList;
 
 @Document(collection = "container")
 public class Container {
@@ -24,8 +29,28 @@ public class Container {
     private String location;
     private String houseNo;
     private Double capacity;
-    private List<PickupHistory> history = new ArrayList<>();
+    private List<PickupHistory> history;
+    private List<ScheduleHistory> schedule;
 
+    public Container withSchedules(LocalDate date, List<Schedule> schedule){
+        Stream.ofNullable(this.schedule)
+                .flatMap(Collection::stream)
+                .filter(s->s.getDate().equals(date))
+                .findFirst()
+                .ifPresentOrElse(h -> h.addAll(schedule),
+                        () -> setSchedule(singletonList(ScheduleHistory.newOf(date).addAll(schedule))));
+        return this;
+    }
+
+    public Container withHistory(LocalDate date, Pickup pickup){
+        Stream.ofNullable(history)
+                .flatMap(Collection::stream)
+                .filter(s->s.getDate().equals(date))
+                .findFirst()
+                .ifPresentOrElse(h -> h.add(pickup),
+                        () -> setHistory(singletonList(PickupHistory.newOf(date).add(pickup))));
+        return this;
+    }
 
     public Double getCapacity() {
         return capacity;
@@ -97,5 +122,13 @@ public class Container {
 
     public void setHistory(List<PickupHistory> history) {
         this.history = history;
+    }
+
+    public List<ScheduleHistory> getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(List<ScheduleHistory> schedule) {
+        this.schedule = schedule;
     }
 }

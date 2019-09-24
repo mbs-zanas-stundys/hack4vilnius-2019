@@ -1,22 +1,26 @@
 package lt.metasite.waste.container.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lt.metasite.waste.container.Container;
-import lt.metasite.waste.container.PickupHistory;
-import lt.metasite.waste.container.dto.ContainerFlatListDto;
+import lt.metasite.waste.container.Pickup;
+import lt.metasite.waste.container.dto.ContainerListView;
+import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
+import lt.metasite.waste.container.dto.ContainerView;
+import lt.metasite.waste.container.dto.MissedPickupContainerView;
 
 public interface WasteContainerRepositoryCustom {
 
-    List<Container> findByGeoLocation(Double longitude, Double latitude, Double distance);
+    List<ContainerListView> findByGeoLocation(Double longitude, Double latitude, Double distance);
 
-    List<Container> findByAddress(String street, String houseNo, String flatNo);
+    Pickup pushHistory(String containerNo, Pickup history);
 
-    PickupHistory pushHistory(String containerNo, PickupHistory history);
+    Container getContainerView(String containerNo);
 
-    Container findByContainerNo(String containerNo);
+    List<Pickup> getPickupHistory(String pickupHistory, LocalDate date);
 
-    List<PickupHistory> getPickupHistory(String pickupHistory);
+    List<ContainerPickupHistoryView> getLowRationContainers(LocalDate date);
 
-    List<ContainerFlatListDto> getLowRationContainers();
+    List<MissedPickupContainerView> getMissedPickupContainers(LocalDate date);
 }

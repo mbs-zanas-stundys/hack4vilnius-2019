@@ -1,36 +1,56 @@
 package lt.metasite.waste.container;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document
 public class PickupHistory {
-    private LocalDateTime date;
-    private String garbageTruckRegNo;
-    private Double weight;
+    private LocalDate date;
+    private List<Pickup> pickups;
 
-    public LocalDateTime getDate() {
+
+    public static PickupHistory newOf(LocalDate date){
+        PickupHistory history = new PickupHistory();
+        history.setDate(date.withDayOfMonth(1));
+        return history;
+    }
+
+    public PickupHistory add(Pickup schedule){
+        if(pickups ==null){
+            pickups = new ArrayList<>();
+        }
+        pickups.add(schedule);
+        return this;
+    }
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public String getGarbageTruckRegNo() {
-        return garbageTruckRegNo;
+    public List<Pickup> getPickups() {
+        return pickups;
     }
 
-    public void setGarbageTruckRegNo(String garbageTruckRegNo) {
-        this.garbageTruckRegNo = garbageTruckRegNo;
+    public void setPickups(List<Pickup> pickups) {
+        this.pickups = pickups;
     }
 
-    public Double getWeight() {
-        return weight;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PickupHistory)) return false;
+        PickupHistory that = (PickupHistory) o;
+        return getDate().equals(that.getDate());
     }
 
-    public void setWeight(Double weight) {
-        this.weight = weight;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate());
     }
 }

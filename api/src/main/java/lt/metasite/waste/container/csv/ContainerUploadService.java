@@ -13,9 +13,7 @@ import java.util.stream.StreamSupport;
 
 import lt.metasite.waste.container.Container;
 import lt.metasite.waste.container.repository.WasteContainerRepository;
-import lt.metasite.waste.container.dto.ContainerCsvDto;
 import lt.metasite.waste.commo.CsvUploadService;
-import lt.metasite.waste.system.GitService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +85,6 @@ public class ContainerUploadService implements CsvUploadService {
 
     @Override
     public int getOrder() {
-        return 2;
+        return 1;
     }
 }

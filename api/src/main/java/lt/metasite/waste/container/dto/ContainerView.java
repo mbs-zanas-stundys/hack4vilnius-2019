@@ -1,15 +1,12 @@
 package lt.metasite.waste.container.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import lt.metasite.waste.container.PickupHistory;
+import lt.metasite.waste.container.Pickup;
 import lt.metasite.waste.container.Schedule;
-
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
-public class ContainerDto {
+import java.util.List;
+
+public class ContainerView {
 
     private String id;
     private String containerNo;
@@ -19,7 +16,16 @@ public class ContainerDto {
     private String location;
     private String houseNo;
     private Double capacity;
-    private Boolean missedPickUp;
+    private List<Pickup> history;
+    private List<Schedule> schedules;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getContainerNo() {
         return containerNo;
@@ -77,19 +83,19 @@ public class ContainerDto {
         this.capacity = capacity;
     }
 
-    public String getId() {
-        return id;
+    public List<Pickup> getHistory() {
+        return history;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setHistory(List<Pickup> history) {
+        this.history = history;
     }
 
-    public Boolean getMissedPickUp() {
-        return missedPickUp;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
-    public void setMissedPickUp(Boolean missedPickUp) {
-        this.missedPickUp = missedPickUp;
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 }

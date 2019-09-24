@@ -1,4 +1,4 @@
-package lt.metasite.waste.container.dto;
+package lt.metasite.waste.container.csv;
 
 import java.util.Date;
 
@@ -6,6 +6,9 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
 public class ScheduleCsvDto {
+
+    @CsvBindByName(column = "Isvezimo plano ID")
+    private String externalId;
 
     @CsvBindByName(column = "Konteinerio Nr")
     private String containerNo;
@@ -39,5 +42,13 @@ public class ScheduleCsvDto {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 }

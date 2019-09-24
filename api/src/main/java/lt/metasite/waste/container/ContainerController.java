@@ -1,11 +1,11 @@
 package lt.metasite.waste.container;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import lt.metasite.waste.container.dto.ContainerDto;
-import lt.metasite.waste.container.dto.ContainerFlatListDto;
+import lt.metasite.waste.container.dto.ContainerListView;
+import lt.metasite.waste.container.dto.MissedPickupContainerView;
+import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,60 +18,60 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/containers")
 public class ContainerController {
     private final ContainerService service;
-    private final ScheduleService scheduleService;
 
     public ContainerController(
-            ContainerService service,
-            ScheduleService scheduleService) {
+            ContainerService service) {
         this.service = service;
-        this.scheduleService = scheduleService;
     }
 
-    @GetMapping(params = {"lon", "lat", "distance"})
-    public List<Container> getContainersByGeoLocation(
+    public List<ContainerListView> getContainersByGeoLocation(
             @RequestParam(name = "lon") Double longitude,
             @RequestParam(name = "lat") Double latitude,
             @RequestParam Double distance) {
         return service.findByPosition(longitude, latitude, distance);
     }
 
-    @GetMapping(params = {"street","houseNo"})
-    public List<Container> getContainersByAddress(
-            @RequestParam String street,
-            @RequestParam String houseNo,
-            @RequestParam(required = false) String flatNo) {
-        return service.findByAddress(street, houseNo, flatNo);
-    }
-
     @GetMapping("/{containerNo}")
-    public Container getContainer(@PathVariable String containerNo){
-        return service.getContainer(containerNo);
+    public Container getContainer(@PathVariable String containerNo) {
+        return service.getContainerView(containerNo);
     }
 
     @GetMapping("/{containerNo}/schedules")
     public List<Schedule> getSchedule(@PathVariable String containerNo,
                                       @RequestParam(required = false) LocalDate dateFrom,
-                                      @RequestParam(required = false) LocalDate dateTo){
-        return scheduleService.getScheduleForContainer(containerNo,
-                                                       dateFrom == null? LocalDate.now() : dateFrom,
-                                                       dateTo == null? LocalDate.now().plusMonths(1).withDayOfMonth(1).minusDays(1): dateTo);
+                                      @RequestParam(required = false) LocalDate dateTo) {
+//        return scheduleService.getScheduleForContainer(containerNo,
+////                dateFrom == null ? LocalDate.now() : dateFrom,
+////                dateTo == null ? LocalDate.now().plusMonths(1).withDayOfMonth(1).minusDays(1) : dateTo);
+        return null;
     }
 
     @GetMapping("/{containerNo}/history")
-    public List<PickupHistory> getContainerPickupHistory(@PathVariable String containerNo){
-        return service.getPickupHistory(containerNo);
+    public List<Pickup> getContainerPickupHistory(@PathVariable String containerNo,
+                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        return service.getPickupHistory(containerNo, date);
     }
 
     @GetMapping("/delayed")
-    public List<ContainerDto> getMissedContainers(@RequestParam  @DateTimeFormat(iso =
-            DateTimeFormat.ISO.DATE) LocalDate date){
+    public List<MissedPickupContainerView> getMissedContainers(@RequestParam(required = false) @DateTimeFormat(iso =
+            DateTimeFormat.ISO.DATE) LocalDate date) {
+        if(date == null){
+            date = LocalDate.now();
+        }
         return service.getDelayedContainersForDate(date);
     }
 
 
     @GetMapping("/low-ratio")
-    public List<ContainerFlatListDto> lowRatioContainers(){
-        return service.getLowRatioContainers();
+    public List<ContainerPickupHistoryView> lowRatioContainers(@RequestParam(required = false)
+                                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        return service.getLowRatioContainers(date);
     }
 
 }

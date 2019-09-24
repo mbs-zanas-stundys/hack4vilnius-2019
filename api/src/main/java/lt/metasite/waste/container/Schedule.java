@@ -6,39 +6,9 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "schedule")
 public class Schedule {
-    @Id
-    private String id;
-    private String containerNo;
-    private String company;
+    private Long externalId;
     private LocalDate expectedDate;
-    private LocalDateTime actualDate;
-    private Boolean wasLate;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getContainerNo() {
-        return containerNo;
-    }
-
-    public void setContainerNo(String containerNo) {
-        this.containerNo = containerNo;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
 
     public LocalDate getExpectedDate() {
         return expectedDate;
@@ -48,19 +18,11 @@ public class Schedule {
         this.expectedDate = expectedDate;
     }
 
-    public Boolean getWasLate() {
-        return wasLate;
+    public Long getExternalId() {
+        return externalId;
     }
 
-    public void setWasLate(Boolean wasLate) {
-        this.wasLate = wasLate;
-    }
-
-    public LocalDateTime getActualDate() {
-        return actualDate;
-    }
-
-    public void setActualDate(LocalDateTime actualDate) {
-        this.actualDate = actualDate;
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 }

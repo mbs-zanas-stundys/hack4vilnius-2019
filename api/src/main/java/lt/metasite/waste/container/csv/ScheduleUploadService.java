@@ -10,16 +10,15 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import lt.metasite.waste.container.Schedule;
-import lt.metasite.waste.container.dto.ScheduleCsvDto;
 import lt.metasite.waste.container.repository.ScheduleRepository;
 import lt.metasite.waste.commo.CsvUploadService;
-import lt.metasite.waste.system.GitService;
 
-import org.apache.juli.logging.Log;
+import lt.metasite.waste.container.repository.WasteContainerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,16 +27,18 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import static java.time.LocalDateTime.now;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ScheduleUploadService implements CsvUploadService {
 
-    private final ScheduleRepository repository;
+    private final WasteContainerRepository repository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleUploadService.class);
 
 
-    public ScheduleUploadService(ScheduleRepository repository) {
+    public ScheduleUploadService(WasteContainerRepository repository) {
         this.repository = repository;
     }
 
@@ -56,18 +57,9 @@ public class ScheduleUploadService implements CsvUploadService {
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();
 
-            List<Schedule> list = StreamSupport.stream(csvToBean.spliterator(), true)
-                                               .map(this::fromCsv)
-                                               .collect(Collectors.toList());
-            List<String> existingContainers = repository.findAll()
-                    .stream()
-                    .map(s->s.getContainerNo()+"_"+s.getExpectedDate())
-                    .collect(Collectors.toList());
-
-           repository.saveAll(list.stream()
-                                                .filter(s -> !existingContainers.contains(s.getContainerNo()+"_"+s.getExpectedDate()))
-                                                .filter(s->s.getExpectedDate().isAfter(LocalDate.parse("2019-09-09"))) // Temp fix
-                                                .collect(Collectors.toList()));
+            StreamSupport.stream(csvToBean.spliterator(), true)
+                    .collect(groupingBy(ScheduleCsvDto::getContainerNo))
+                    .forEach(this::saveSchedules);
 
            LOGGER.info("Upload finished");
         } catch (IOException e) {
@@ -82,13 +74,19 @@ public class ScheduleUploadService implements CsvUploadService {
 
     @Override
     public int getOrder() {
-        return 1;
+        return 2;
+    }
+
+    private void saveSchedules(String containerNo, List<ScheduleCsvDto> scheduleCsvDtos){
+        repository.findByContainerNo(containerNo)
+                .map(c -> c.withSchedules(LocalDate.now().withDayOfMonth(1), scheduleCsvDtos.stream()
+                        .map(this::fromCsv)
+                        .collect(toList())))
+                .ifPresent(repository::save);
     }
 
     private Schedule fromCsv(ScheduleCsvDto csvDto){
         Schedule schedule = new Schedule();
-        schedule.setCompany(csvDto.getCompany());
-        schedule.setContainerNo(csvDto.getContainerNo());
         schedule.setExpectedDate(LocalDate.ofInstant(csvDto.getExpectedDate().toInstant(), ZoneId.systemDefault()));
         return schedule;
     }
