@@ -111,7 +111,7 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
     }
 
     @Override
-    public Container getContainerView(String containerNo) {
+    public ContainerView getContainerView(String containerNo) {
         List<AggregationOperation> operations = new ArrayList<>();
         ConditionalOperators.Cond historySlice =
         when(valueOf(arrayOf(ifNull("history").then(emptyList())).length()).greaterThanValue(0))
@@ -132,11 +132,23 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
                 .and("capacity").as("capacity")
                 .and(historySlice).as("history")
                 .and(scheduleSlice).as("schedule"));
+        operations.add(unwind("history"));
+        operations.add(unwind("schedule"));
+        operations.add(project().and("containerNo").as("containerNo")
+                .and("position").as("position")
+                .and("street").as("street")
+                .and("company").as("company")
+                .and("location").as("location")
+                .and("houseNo").as("houseNo")
+                .and("capacity").as("capacity")
+                .and("history.pickups").as("history")
+                .and("schedule.schedules").as("schedules")
+        );
         TypedAggregation<Container> aggregation =
                 newAggregation(Container.class,
                                operations
                 );
-        return mongoTemplate.aggregate(aggregation,Container.class).getUniqueMappedResult();
+        return mongoTemplate.aggregate(aggregation,ContainerView.class).getUniqueMappedResult();
     }
 
     @Override

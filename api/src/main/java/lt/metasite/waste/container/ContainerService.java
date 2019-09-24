@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import lt.metasite.waste.container.dto.ContainerListView;
+import lt.metasite.waste.container.dto.ContainerView;
 import lt.metasite.waste.container.dto.MissedPickupContainerView;
 import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
 import lt.metasite.waste.container.repository.WasteContainerRepository;
@@ -31,7 +32,7 @@ public class ContainerService {
         return repository.findByGeoLocation(longitude, latitude, distance);
     }
 
-    public Container getContainerView(String containerNo) {
+    public ContainerView getContainerView(String containerNo) {
         return repository.getContainerView(containerNo);
     }
 

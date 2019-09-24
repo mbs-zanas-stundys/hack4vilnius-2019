@@ -16,7 +16,7 @@ public interface WasteContainerRepositoryCustom {
 
     Pickup pushHistory(String containerNo, Pickup history);
 
-    Container getContainerView(String containerNo);
+    ContainerView getContainerView(String containerNo);
 
     List<Pickup> getPickupHistory(String pickupHistory, LocalDate date);
 

@@ -3,7 +3,7 @@ package lt.metasite.waste.container;
 import java.time.LocalDateTime;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-
+@Document
 public class Pickup {
     private LocalDateTime date;
     private String garbageTruckRegNo;

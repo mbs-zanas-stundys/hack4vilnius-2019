@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import lt.metasite.waste.container.dto.ContainerListView;
+import lt.metasite.waste.container.dto.ContainerView;
 import lt.metasite.waste.container.dto.MissedPickupContainerView;
 import lt.metasite.waste.container.dto.ContainerPickupHistoryView;
 
@@ -32,7 +33,7 @@ public class ContainerController {
     }
 
     @GetMapping("/{containerNo}")
-    public Container getContainer(@PathVariable String containerNo) {
+    public ContainerView getContainer(@PathVariable String containerNo) {
         return service.getContainerView(containerNo);
     }
 
