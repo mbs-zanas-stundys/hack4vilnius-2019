@@ -1,0 +1,46 @@
+button {
+  -webkit-appearance: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4em;
+  outline: none;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 1rem;
+  color: rgba(0, 0, 0, 0.58);
+  font-weight: 500;
+  transition: background-color 0.5s,
+    box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  background: none;
+}
+
+button:focus,
+button:hover {
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+button.primary {
+  background: #46a147 linear-gradient(85deg, #85c04a, transparent);
+  box-shadow: 0 2px 4px #51a64787;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+button.primary:focus,
+button.primary:hover {
+  background-color: #85c04a;
+  box-shadow: 0 4px 8px 2px #51a64787;
+}
+
+button.secondary {
+  background: #fff;
+  border: 1px solid #46a147;
+  color: #46a147;
+}
+
+button.secondary:focus,
+button.secondary:hover {
+  background: rgba(133, 192, 74, 0.102);
+  box-shadow: 0 0 0 1px #46a147;
+}

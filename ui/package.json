@@ -1,26 +1,32 @@
 {
-  "name": "ui",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "susitvarkome-vilnius",
+  "description": "Web-based app that displays publicly available waste management data of Vilnius' city in an intuitive & user-friendly way",
+  "contributors": [
+    "Žanas Stundys <zanas.stundys@metasite.net>"
+  ],
+  "version": "0.0.1",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently \"npm:watch:*\"",
+    "watch:html": "serve",
+    "watch:ts": "tsc -w"
   },
   "keywords": [],
-  "author": "",
+  "author": "Žanas Stundys <zanas.stundys@metasite.net>",
   "license": "ISC",
   "devDependencies": {
     "@types/arcgis-js-api": "^4.12.0",
+    "@types/date-fns": "^2.6.0",
     "@types/jquery": "^3.3.31",
+    "@types/node": "^12.7.5",
+    "concurrently": "^5.0.0",
     "dojo-typings": "^1.11.9",
-    "prettier": "^1.18.2"
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^1.18.2",
+    "serve": "^11.2.0"
   },
   "dependencies": {
-    "@types/date-fns": "^2.6.0",
-    "@types/node": "^12.7.5",
-    "date-fns": "^2.2.1",
     "jquery": "^3.4.1",
-    "lodash.debounce": "^4.0.8",
-    "moment": "^2.24.0"
-  },
-  "description": ""
+    "moment": "^2.24.0",
+    "typescript": "^3.6.3"
+  }
 }

@@ -1,0 +1,36 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: "Yantramanav", sans-serif;
+}
+
+header {
+  flex: 0 0 auto;
+}
+
+main {
+  flex: 1 0 auto;
+  position: relative;
+}
+
+html,
+body,
+#mapBlock {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+#mapBlock {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

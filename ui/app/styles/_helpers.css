@@ -1,0 +1,18 @@
+.hide {
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.d-none {
+  display: none !important;
+}

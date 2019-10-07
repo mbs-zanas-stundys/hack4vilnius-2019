@@ -1,0 +1,86 @@
+.overlay,
+.overlay-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  transition: all 0.5s;
+}
+
+.overlay input {
+  -webkit-appearance: none;
+  border: none;
+  background: #fff;
+  border-radius: 4rem;
+  font-size: 16px;
+  box-shadow: 0 2px 4px #00000014;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  outline: none;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+}
+
+.overlay input:focus {
+  border-color: #46a147;
+}
+
+.overlay input:hover {
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+#logo {
+  margin-top: 7rem;
+  margin-bottom: 0.5rem;
+  width: 190px;
+}
+
+.overlay p {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: rgba(0, 0, 0, 0.58);
+}
+
+.overlay button,
+.overlay input {
+  min-width: 290px;
+}
+
+.actions-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.actions-overlay > * {
+  pointer-events: all;
+}
+
+.overlay-buttons,
+.overlay-form {
+  height: 300px;
+}
+
+.overlay h1,
+.overlay h2,
+.overlay h3,
+.overlay h4,
+.overlay h5,
+.overlay h6 {
+  font-family: "Jomhuria", cursive;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.15;
+}

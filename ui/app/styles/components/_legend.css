@@ -1,0 +1,8 @@
+#legendBlock {
+  background-color: white;
+  padding: 1rem;
+  max-height: 375px;
+  border-radius: 21px;
+  overflow: auto;
+  min-width: 255px;
+}
