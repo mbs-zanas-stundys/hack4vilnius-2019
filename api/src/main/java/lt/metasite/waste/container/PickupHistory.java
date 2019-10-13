@@ -1,13 +1,11 @@
 package lt.metasite.waste.container;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PickupHistory {
     private LocalDate date;
-    private List<Pickup> pickups;
+    private Set<Pickup> pickups;
 
 
     public static PickupHistory newOf(LocalDate date){
@@ -18,8 +16,9 @@ public class PickupHistory {
 
     public PickupHistory add(Pickup schedule){
         if(pickups ==null){
-            pickups = new ArrayList<>();
+            pickups = new HashSet<>();
         }
+
         pickups.add(schedule);
         return this;
     }
@@ -33,11 +32,11 @@ public class PickupHistory {
         this.date = date;
     }
 
-    public List<Pickup> getPickups() {
+    public Set<Pickup> getPickups() {
         return pickups;
     }
 
-    public void setPickups(List<Pickup> pickups) {
+    public void setPickups(Set<Pickup> pickups) {
         this.pickups = pickups;
     }
 

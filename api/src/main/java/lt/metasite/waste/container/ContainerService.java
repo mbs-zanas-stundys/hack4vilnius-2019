@@ -17,13 +17,6 @@ public class ContainerService {
         this.repository = repository;
     }
 
-    public String save() {
-        Container container = new Container();
-
-
-        return repository.save(container).getId();
-    }
-
     public List<ContainerListView> findByPosition(Double longitude, Double latitude, Double distance) {
 
         return repository.findByGeoLocation(longitude, latitude, distance);

@@ -1,6 +1,7 @@
 package lt.metasite.waste.container;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 @Document
@@ -40,5 +41,18 @@ public class Pickup {
 
     public void setExternalId(Long externalId) {
         this.externalId = externalId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pickup)) return false;
+        Pickup pickup = (Pickup) o;
+        return Objects.equals(getExternalId(), pickup.getExternalId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getExternalId());
     }
 }

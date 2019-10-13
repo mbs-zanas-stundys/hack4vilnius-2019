@@ -1,13 +1,11 @@
 package lt.metasite.waste.container;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ScheduleHistory {
     private LocalDate date;
-    private List<Schedule> schedules;
+    private Set<Schedule> schedules;
 
     public ScheduleHistory(){
 
@@ -21,7 +19,7 @@ public class ScheduleHistory {
 
     public ScheduleHistory add(Schedule schedule){
         if(schedules ==null){
-            schedules = new ArrayList<>();
+            schedules = new HashSet<>();
         }
         schedules.add(schedule);
         return this;
@@ -29,7 +27,7 @@ public class ScheduleHistory {
 
     public ScheduleHistory addAll(List<Schedule> schedule){
         if(schedules ==null){
-            schedules = new ArrayList<>();
+            schedules = new HashSet<>();
         }
         schedules.addAll(schedule);
         return this;
@@ -43,11 +41,11 @@ public class ScheduleHistory {
         this.date = date;
     }
 
-    public List<Schedule> getSchedules() {
+    public Set<Schedule> getSchedules() {
         return schedules;
     }
 
-    public void setSchedules(List<Schedule> schedules) {
+    public void setSchedules(Set<Schedule> schedules) {
         this.schedules = schedules;
     }
 

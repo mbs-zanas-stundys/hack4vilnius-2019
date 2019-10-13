@@ -34,16 +34,6 @@ public class ContainerController {
         return service.getContainerView(containerNo);
     }
 
-    @GetMapping("/{containerNo}/schedules")
-    public List<Schedule> getSchedule(@PathVariable String containerNo,
-                                      @RequestParam(required = false) LocalDate dateFrom,
-                                      @RequestParam(required = false) LocalDate dateTo) {
-//        return scheduleService.getScheduleForContainer(containerNo,
-////                dateFrom == null ? LocalDate.now() : dateFrom,
-////                dateTo == null ? LocalDate.now().plusMonths(1).withDayOfMonth(1).minusDays(1) : dateTo);
-        return null;
-    }
-
     @GetMapping("/{containerNo}/history")
     public List<Pickup> getContainerPickupHistory(@PathVariable String containerNo,
                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
