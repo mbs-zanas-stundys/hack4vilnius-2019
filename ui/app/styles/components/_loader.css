@@ -3,7 +3,7 @@
 }
 
 .loader::after {
-  content: "";
+  content: '';
   width: 24px;
   height: 24px;
   border-radius: 1em;
@@ -15,7 +15,7 @@
 }
 
 .legend--loading h2::after {
-  content: "";
+  content: '';
   width: 24px;
   height: 24px;
   border-radius: 1em;
@@ -28,7 +28,7 @@
 }
 
 .loading::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 21px;
   right: 10px;

@@ -39,16 +39,22 @@ This is an open-source project that's open for collaboration. So, if you'd like 
 
 ### 2. Backend
 
-```
+```sh
+# Open ./api folder
 cd api
+# Start docker (mongodb)
 docker-compose up
+# Start Java server
 ./gradlew clean bootRun
 ```
 
 ### 3. Frontend
 
-```
+```sh
+# Open ./ui folder
 cd ui
+# Install dependencies with npm
 npm install
+# Start http server (default http://localhost:5000)
 npm start
 ```

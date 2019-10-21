@@ -3,78 +3,75 @@ import EsriMap from 'esri/Map';
 import UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
-import LegendWidget from 'esri/widgets/Legend';
 import LocateWidget from 'esri/widgets/Locate';
 import moment from 'moment';
 
-import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from './constants';
-import { Container, CSVPoint, DataType } from './types';
 import { SimpleRenderer } from 'esri/renderers';
+import { defaultSymbol, LEGEND_COLORS, PRODUCTION, START_COORDINATES } from '../shared/constants';
+import { DataType, IContainer, ICSVPoint } from '../shared/types';
 
 export const companyRenderer = new UniqueValueRenderer({
-  field: 'company' as keyof Container,
+  defaultLabel: 'Nežinoma',
+  field: 'company' as keyof IContainer,
   legendOptions: {
     title: 'Paskutinis išvežimas'
   },
-  defaultLabel: 'Nežinoma',
-  // defaultSymbol: defaultSymbol.clone(),
-
   uniqueValueInfos: [
     {
-      value: 'VSA Vilnius',
       label: 'VSA Vilnius',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0]),
+      value: 'VSA Vilnius'
     },
     {
-      value: 'Ekonovus',
       label: 'Ekonovus',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1]),
+      value: 'Ekonovus'
     },
     {
-      value: 'Ecoservice',
       label: 'Ecoservice',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3]),
+      value: 'Ecoservice'
     }
   ]
 });
 
 export const unloadRenderer = new UniqueValueRenderer({
-  field: 'ratio' as keyof Container,
+  defaultSymbol: defaultSymbol.clone(),
+  field: 'ratio' as keyof IContainer,
   legendOptions: {
     title: 'Paskutinis išvežimas'
   },
-  defaultSymbol: defaultSymbol.clone(),
   visualVariables: [
     new ColorVariable({
-      field: 'ratio' as keyof Container,
+      field: 'ratio' as keyof IContainer,
       legendOptions: {
         title: 'Paskutinis išvežimas'
       },
       stops: [
         {
-          value: 0,
           color: LEGEND_COLORS[3],
-          label: '<2.5 kg/m³'
+          label: '<2.5 kg/m³',
+          value: 0
         },
         {
-          value: 2.5,
           color: LEGEND_COLORS[1],
-          label: '2.5 — 5.0 kg/m³'
+          label: '2.5 — 5.0 kg/m³',
+          value: 2.5
         },
         {
-          value: 5,
+          color: LEGEND_COLORS[0],
           label: '5 — 7.5 kg/m³',
-          color: LEGEND_COLORS[0]
+          value: 5
         },
         {
-          value: 7.5,
+          color: LEGEND_COLORS[2],
           label: '7.5 - 10.0 kg/m³',
-          color: LEGEND_COLORS[2]
+          value: 7.5
         },
         {
-          value: 10,
+          color: LEGEND_COLORS[2],
           label: '>10.0 kg/m³',
-          color: LEGEND_COLORS[2]
+          value: 10
         }
       ]
     })
@@ -82,25 +79,25 @@ export const unloadRenderer = new UniqueValueRenderer({
 });
 
 export const missedPickUpRenderer = new UniqueValueRenderer({
-  field: 'missedPickUp' as keyof Container,
+  field: 'missedPickUp' as keyof IContainer,
   legendOptions: {
     title: 'Praleisti vėžimai'
   },
   uniqueValueInfos: [
     {
-      value: 'false',
       label: 'Nepraleista',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0]),
+      value: 'false'
     },
     {
-      value: 'true',
       label: 'Praleista',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3])
+      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3]),
+      value: 'true'
     },
     {
-      value: 'Nežinoma',
       label: 'Nežinoma',
-      symbol: defaultSymbol.clone().set('color', '#ccc')
+      symbol: defaultSymbol.clone().set('color', '#ccc'),
+      value: 'Nežinoma'
     }
   ]
   // defaultSymbol: defaultSymbol.clone()
@@ -111,124 +108,94 @@ const map = new EsriMap({
 });
 
 const view = new MapView({
-  map: map,
-  container: 'mapBlock',
   center: START_COORDINATES,
-  ui: {
-    components: []
-  },
-  zoom: 16,
   constraints: {
     minZoom: 14,
     snapToZoom: false
-  }
+  },
+  container: 'mapBlock',
+  map,
+  ui: {
+    components: []
+  },
+  zoom: 16
 });
 
 const locateWidget = new LocateWidget({
   view
-
-  // goToOverride: (view, goToParams) => {
-  //   view.when(() => {
-  //     return view.goTo(goToParams.target, goToParams.options).then(() => {
-  //       view.emit('locate', goToParams);
-  //     });
-  //   });
-  // }
-});
-
-const legendWidget = new LegendWidget({
-  view,
-  container: 'legendContentBlock'
 });
 
 const featureLayer = new FeatureLayer({
-  renderer: new SimpleRenderer(),
-  geometryType: 'point',
-  visible: true,
-  objectIdField: 'id' as keyof Container,
-  source: [],
   fields: [
     {
-      name: 'id' as keyof Container,
+      name: 'id' as keyof IContainer,
       type: 'oid'
     },
     {
-      name: 'containerNo' as keyof Container,
+      name: 'containerNo' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'missedPickUp' as keyof Container,
+      name: 'missedPickUp' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'capacity' as keyof Container,
+      name: 'capacity' as keyof IContainer,
       type: 'double'
     },
     {
-      name: 'weight' as keyof Container,
+      name: 'weight' as keyof IContainer,
       type: 'double'
     },
     {
-      name: 'ratio' as keyof Container,
+      name: 'ratio' as keyof IContainer,
       type: 'double'
     },
     {
-      name: 'company' as keyof Container,
+      name: 'company' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'houseNo' as keyof Container,
+      name: 'houseNo' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'street' as keyof Container,
+      name: 'street' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'location' as keyof Container,
+      name: 'location' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'position' as keyof Container,
+      name: 'position' as keyof IContainer,
       type: 'geometry'
     },
     {
-      name: 'history' as keyof Container,
+      name: 'history' as keyof IContainer,
       type: 'blob'
     },
     {
-      name: 'lastUnload' as keyof Container,
+      name: 'lastUnload' as keyof IContainer,
       type: 'string'
     },
     {
-      name: 'lastUnloadDays' as keyof Container,
+      name: 'lastUnloadDays' as keyof IContainer,
       type: 'blob'
     },
     {
-      name: 'lastUnloadWords' as keyof Container,
+      name: 'lastUnloadWords' as keyof IContainer,
       type: 'string'
     }
   ],
+  geometryType: 'point',
+  objectIdField: 'id' as keyof IContainer,
   popupEnabled: true,
-  spatialReference: {
-    wkid: 4326
-  },
   popupTemplate: {
-    title: (point: CSVPoint<Container>) => {
-      return (
-        point.graphic.attributes.containerNo +
-        ' — ' +
-        point.graphic.attributes.street +
-        ' ' +
-        point.graphic.attributes.houseNo
-      );
-    },
-    content: (point: CSVPoint<Container>) => {
+    content: (point: ICSVPoint<IContainer>) => {
       const a = point.graphic.attributes;
-
       const dataType = $('#container-data-type').val() as DataType;
-
-      const dataByType: Record<DataType, Function> = {
+      const dataByType: Record<DataType, () => void> = {
         [DataType.lastUnload]: () => {
           return `<container-history container-no="${a.containerNo}"></container-history>`;
         },
@@ -246,11 +213,25 @@ const featureLayer = new FeatureLayer({
           `;
         }
       };
-
       return dataByType[dataType]();
     },
-    outFields: ['*']
-  }
+    outFields: ['*'],
+    title: (point: ICSVPoint<IContainer>) => {
+      return (
+        point.graphic.attributes.containerNo +
+        ' — ' +
+        point.graphic.attributes.street +
+        ' ' +
+        point.graphic.attributes.houseNo
+      );
+    }
+  },
+  renderer: new SimpleRenderer(),
+  source: [],
+  spatialReference: {
+    wkid: 4326
+  },
+  visible: true
 });
 
 map.layers.add(featureLayer, 1);
@@ -258,15 +239,22 @@ map.layers.add(featureLayer, 1);
 view.ui.add(locateWidget, 'top-left');
 view.ui.add('legendBlock', 'bottom-left');
 
-view.on('click', clickEvent => {
-  console.log('view', {
-    clickEvent,
-    view,
-    zoom: view.zoom,
-    scale: view.scale,
-    latitude: clickEvent.mapPoint.latitude,
-    longitude: clickEvent.mapPoint.longitude
+if (!PRODUCTION) {
+  setupDeveloperMode();
+}
+
+function setupDeveloperMode() {
+  view.on('click', clickEvent => {
+    // tslint:disable-next-line: no-console
+    console.debug('view', {
+      clickEvent,
+      latitude: clickEvent.mapPoint.latitude,
+      longitude: clickEvent.mapPoint.longitude,
+      scale: view.scale,
+      view,
+      zoom: view.zoom
+    });
   });
-});
+}
 
 export { view, map, featureLayer, locateWidget };

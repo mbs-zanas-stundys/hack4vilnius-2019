@@ -1,12 +1,12 @@
-@import "/app/styles/_base.css";
-@import "/app/styles/_animations.css";
-@import "/app/styles/_typography.css";
+@import '/app/styles/_base.css';
+@import '/app/styles/_animations.css';
+@import '/app/styles/_typography.css';
 
-@import "/app/styles/components/_button.css";
-@import "/app/styles/components/_legend.css";
-@import "/app/styles/components/_loader.css";
-@import "/app/styles/components/_overlay.css";
-@import "/app/styles/components/_select.css";
+@import '/app/styles/components/_button.css';
+@import '/app/styles/components/_legend.css';
+@import '/app/styles/components/_loader.css';
+@import '/app/styles/components/_overlay.css';
+@import '/app/styles/components/_select.css';
 
-@import "/app/styles/_esri-overrides.css";
-@import "/app/styles/_helpers.css";
+@import '/app/styles/_esri-overrides.css';
+@import '/app/styles/_helpers.css';

@@ -4,11 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    
+
     <title>Susitvarkom - Hack4Vilnius</title>
 
     <link href="https://js.arcgis.com/4.12/esri/css/main.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Jomhuria|Yantramanav:400,500,700&display=swap" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css?family=Jomhuria|Yantramanav:400,500,700&display=swap"
+      rel="stylesheet"
+    />
     <link href="/app/styles/styles.css" rel="stylesheet" />
   </head>
   <body>
@@ -26,7 +29,7 @@
             <option value="missed-pickups">Praleisti išvežimai</option>
           </select>
         </div>
-        
+
         <div id="legendContentBlock"></div>
         <button
           style="margin: 0.5rem 0 0 0; width: 100%"
@@ -38,7 +41,7 @@
         </button>
       </div>
     </div>
-    
+
     <section class="overlay">
       <div class="overlay-content">
         <img id="logo" src="/app/images/logo.svg" />
@@ -65,13 +68,13 @@
     </section>
 
     <script>
-      var locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+      var locationPath = location.pathname.replace(/\/[^\/]+$/, '');
       window.dojoConfig = {
-        locale: "lt",
+        locale: 'lt',
         packages: [
           {
-            name: "app",
-            location: locationPath + "/app"
+            name: 'app',
+            location: locationPath + '/app'
           }
         ]
       };

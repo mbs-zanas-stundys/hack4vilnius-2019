@@ -3,7 +3,7 @@
 }
 
 .custom-select::before {
-  content: "";
+  content: '';
   border: 4px solid transparent;
   border-top-color: #46a147;
   position: absolute;

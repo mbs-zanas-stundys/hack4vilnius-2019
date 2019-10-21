@@ -76,12 +76,11 @@
   margin-bottom: 0;
 }
 
-.legend--unload-ratio
-  .esri-legend__layer-table.esri-legend__layer-table--size-ramp:first-child {
+.legend--unload-ratio .esri-legend__layer-table.esri-legend__layer-table--size-ramp:first-child {
   display: none;
 }
 
-[role="button"] {
+[role='button'] {
   outline: none !important;
 }
 

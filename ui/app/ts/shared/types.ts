@@ -1,10 +1,10 @@
-export interface ContainerHistory {
+export interface IContainerHistory {
   date: '2019-09-18T18:23:15';
   garbageTruckRegNo: 'KBE 709';
   weight: 45;
 }
 
-export interface ContainerDTO {
+export interface IContainerDTO {
   capacity: number;
   company: string;
   containerNo: string;
@@ -13,7 +13,7 @@ export interface ContainerDTO {
   ratio: number;
   weight: number;
   garbageTruckNo: string;
-  history: ContainerHistory[];
+  history: IContainerHistory[];
   id: string;
   location: string;
   position: { x: number; y: number; type: 'Point'; coordinates: [number, number] };
@@ -21,20 +21,20 @@ export interface ContainerDTO {
   missedPickUp?: boolean;
 }
 
-export interface Container extends Omit<ContainerDTO, 'missedPickUp'> {
+export interface IContainer extends Omit<IContainerDTO, 'missedPickUp'> {
   lastUnload: string;
   lastUnloadWords: string;
   lastUnloadDays: number | string;
   missedPickUp?: string;
 }
 
-export interface CSVPoint<T> {
+export interface ICSVPoint<T> {
   graphic: {
     attributes: T;
   };
 }
 
-export interface Schedule {
+export interface ISchedule {
   id: string;
   containerNo: string;
   company: string;

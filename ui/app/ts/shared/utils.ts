@@ -1,8 +1,8 @@
 import PointGeometry from 'esri/geometry/Point';
 import Graphic from 'esri/Graphic';
 
-import { featureLayer, view } from './map';
-import { Container } from './types';
+import { featureLayer, view } from '../components/map';
+import { IContainer } from './types';
 
 export const get = async <T = any>(
   url: string,
@@ -15,7 +15,9 @@ export const get = async <T = any>(
     .join('&');
 
   let constructedPath = url;
-  Object.entries(pathParams).forEach(([key, value]) => (constructedPath = constructedPath.replace(`:${key}`, value)));
+  Object.entries(pathParams).forEach(
+    ([key, value]) => (constructedPath = constructedPath.replace(`:${key}`, value))
+  );
 
   if (httpParams) {
     httpParams = '?' + httpParams;
@@ -26,19 +28,23 @@ export const get = async <T = any>(
   return await res.json();
 };
 
-export const debounce = <T extends Function>(func: T, wait: number, immediate): T => {
-  var timeout;
+export const debounce = <T extends (...args: any) => void>(func: T, wait: number, immediate): T => {
+  let timeout;
   return function(this: any) {
-    var context = this;
-    var args = arguments;
-    var later = function() {
+    const context = this;
+    const args = arguments as any;
+    const later = () => {
       timeout = null;
-      if (!immediate) func.apply(context, args);
+      if (!immediate) {
+        func.apply(context, args);
+      }
     };
-    var callNow = immediate && !timeout;
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
+    if (callNow) {
+      func.apply(context, args);
+    }
   } as any;
 };
 
@@ -66,15 +72,15 @@ export const replaceMapFeatures = (features: Graphic[]) => {
   });
 };
 
-export const mapContainersToMapFeatures = (containers: Container[]): Graphic[] => {
+export const mapContainersToMapFeatures = (containers: IContainer[]): Graphic[] => {
   return containers.map(
     c =>
       new Graphic({
+        attributes: c,
         geometry: new PointGeometry({
           latitude: c.position.y,
           longitude: c.position.x
-        }),
-        attributes: c
+        })
       })
   );
 };

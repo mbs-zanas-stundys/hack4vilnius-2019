@@ -1,23 +1,18 @@
-import { api } from './api';
 import moment = require('moment');
+import { api } from '../shared/api';
 
 class ContainerHistoryElement extends HTMLElement {
   constructor(props) {
-    // Always call super first in constructor
     super();
-
-    // Element functionality written in here
-
-    // ...
 
     const containerNo = this.getAttribute('container-no') || '';
 
     if (containerNo) {
       this.innerHTML = '<span class="loader"></span>';
 
-      Promise.all([api.containerDetails(containerNo), api.containerSchedule(containerNo)]).then(([res, schedule]) => {
-        console.log(res);
-        this.innerHTML = `
+      Promise.all([api.containerDetails(containerNo), api.containerSchedule(containerNo)]).then(
+        ([res, schedule]) => {
+          this.innerHTML = `
           <table>
             <tr><td>Gatvė</td><td>${res.street}</td></tr>
             <tr><td>Namas</td><td>${res.houseNo}</td></tr>
@@ -25,15 +20,20 @@ class ContainerHistoryElement extends HTMLElement {
             <tr><td>Talpa</td><td>${res.capacity} m³</td></tr>
             <tr><td>Vežėjas</td><td>${res.company}</td></tr>
             
-            <tr><td>Pask. išvėžimas</td><td title="${res.lastUnload}">${res.lastUnloadWords}</td></tr>
+            <tr><td>Pask. išvėžimas</td><td title="${res.lastUnload}">${
+            res.lastUnloadWords
+          }</td></tr>
             <tr><td>Sekantys vėžimai</td><td>${
               schedule.length
-                ? schedule.map(s => moment(s.expectedDate).format('YYYY-MM-DD[, ] dddd')).join('<br/>')
+                ? schedule
+                    .map(s => moment(s.expectedDate).format('YYYY-MM-DD[, ] dddd'))
+                    .join('<br/>')
                 : 'Nėra'
             }</td></tr>
           </table>
         `;
-      });
+        }
+      );
     }
   }
 }

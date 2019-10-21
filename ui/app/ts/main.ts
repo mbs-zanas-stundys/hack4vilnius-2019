@@ -1,9 +1,14 @@
-import { api } from './api';
-import { SEARCH_RADIUS, PRODUCTION } from './constants';
-import * as map from './map';
-import { DataType } from './types';
-import { debounce, onMapInteract, replaceMapFeatures, mapContainersToMapFeatures } from './utils';
-import './container-history';
+import './components/container-history';
+import * as map from './components/map';
+import { api } from './shared/api';
+import { PRODUCTION, SEARCH_RADIUS } from './shared/constants';
+import { DataType } from './shared/types';
+import {
+  debounce,
+  mapContainersToMapFeatures,
+  onMapInteract,
+  replaceMapFeatures
+} from './shared/utils';
 
 const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
 const overlayElement = $('.overlay')!;
@@ -24,10 +29,11 @@ btnFindLocation.click(e => {
   btnFindLocation.addClass('loading');
   map.locateWidget
     .locate()
-    .then((coordinates: Position) => fetchFeaturesByCoords(coordinates.coords.latitude, coordinates.coords.longitude))
+    .then((coordinates: Position) =>
+      fetchFeaturesByCoords(coordinates.coords.latitude, coordinates.coords.longitude)
+    )
     .then(() => hideOverlay())
     .catch(() => {
-      console.log('Could not find location');
       btnFindLocation.removeClass('loading');
       alert('Nepavyko nustatyti jūsų pozicijos. Bandykite dar kartą');
     });
@@ -109,7 +115,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
 
   startLoading();
 
-  const dataByType: Record<DataType, Function> = {
+  const dataByType: Record<DataType, () => void> = {
     [DataType.lastUnload]: () => {
       api
         .containersByCoordinates(
@@ -129,7 +135,6 @@ function fetchFeaturesByCoords(latitude, longitude) {
     [DataType.unloadRatio]: () => {
       api.containersLowRatio().then(containers => {
         const features = mapContainersToMapFeatures(containers);
-        console.log('unloadRatio', { containers });
 
         map.featureLayer.set('renderer', map.unloadRenderer);
         replaceMapFeatures(features);
@@ -140,7 +145,6 @@ function fetchFeaturesByCoords(latitude, longitude) {
     [DataType.missedPickups]: () => {
       api.containersMissedPickups().then(containers => {
         const features = mapContainersToMapFeatures(containers);
-        console.log('missedPickups', { containers });
 
         map.featureLayer.set('renderer', map.missedPickUpRenderer);
         replaceMapFeatures(features);
