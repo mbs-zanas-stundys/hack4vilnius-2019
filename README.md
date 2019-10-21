@@ -25,7 +25,11 @@ We're all from a lovely place called [Metasite](https://www.metasite.net/).
 
 # 🤝 Contribution
 
-This is an open-source project that's open for collaboration. So, if you'd like to contribute. Feel free to open a pull request. It might get added to the project ;)
+This is an open-source project that's open for collaboration.  
+So, if you'd like to contribute, checkout the "Issues" page on this repo and 
+feel free to open a pull request.
+
+_Your contributions_ will make this project move forward 😉
 
 # 💻 How to start developing locally
 
