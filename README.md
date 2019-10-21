@@ -37,18 +37,37 @@ This is an open-source project that's open for collaboration. So, if you'd like 
 - Frontend
   - Node 12
 
-### 2. Backend
+### 2. Backend dependencies (docker)
 
 ```sh
 # Open ./api folder
 cd api
 # Start docker (mongodb)
 docker-compose up
-# Start Java server
+```
+
+**IMPORTANT** Once docker is running, you need to pre-populate
+the database:
+1.  Open `./api/src/main/resources/application.properties`
+2.  Set `git-download.enabled=false` to `git-download.enabled=true`
+3.  Continue "Step 3", should take a while to import the required data.  
+    Please note that the data that's being imported is outdated, since it was
+    prepared during the hackathon.  
+    Nonetheless, it should be enough to continue development.
+4.  Once the import has finished, you can change `git-download.enabled` to `false`
+    to prevent repeating the data pre-population.
+
+
+### 3. Start Java backend 
+
+```sh
+# Open ./api folder
+cd api
+# Run Java server
 ./gradlew clean bootRun
 ```
 
-### 3. Frontend
+### 4. Frontend
 
 ```sh
 # Open ./ui folder

@@ -8,7 +8,9 @@
   "scripts": {
     "start": "concurrently \"npm:watch:*\"",
     "watch:html": "serve",
-    "watch:ts": "tsc -w"
+    "watch:ts": "tsc -w",
+    "build": "concurrently \"npm:build:*\"",
+    "build:ts": "tsc"
   },
   "keywords": [],
   "author": "Žanas Stundys <zanas.stundys@metasite.net>",

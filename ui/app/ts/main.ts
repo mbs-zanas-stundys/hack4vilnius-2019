@@ -1,7 +1,7 @@
 import './components/container-history';
 import * as map from './components/map';
 import { api } from './shared/api';
-import { PRODUCTION, SEARCH_RADIUS } from './shared/constants';
+import { DEBUG_MODE, SEARCH_RADIUS } from './shared/constants';
 import { DataType } from './shared/types';
 import {
   debounce,
@@ -75,12 +75,6 @@ btnShowButtons.click(e => {
 dataTypeSelect.change(() => {
   fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
 });
-
-if (!PRODUCTION) {
-  map.view.when(() => {
-    btnShowMap.click();
-  });
-}
 
 function hideOverlay() {
   legendBlock.removeClass('hide');
@@ -157,6 +151,24 @@ function fetchFeaturesByCoords(latitude, longitude) {
   dataByType[value]();
 }
 
+function setupDevMode() {
+  map.view.when(() => {
+    btnShowMap.click();
+  });
+
+  map.view.on('click', clickEvent => {
+    // tslint:disable-next-line: no-console
+    console.debug('view', {
+      clickEvent,
+      latitude: clickEvent.mapPoint.latitude,
+      longitude: clickEvent.mapPoint.longitude,
+      scale: map.view.scale,
+      view: map.view,
+      zoom: map.view.zoom
+    });
+  });
+}
+
 map.view.when(() => {
   onMapInteract(() => {
     const value = dataTypeSelect.val() as DataType;
@@ -165,3 +177,7 @@ map.view.when(() => {
     }
   });
 });
+
+if (DEBUG_MODE) {
+  setupDevMode();
+}

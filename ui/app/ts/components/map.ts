@@ -1,13 +1,12 @@
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import EsriMap from 'esri/Map';
+import { SimpleRenderer } from 'esri/renderers';
 import UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
 import LocateWidget from 'esri/widgets/Locate';
 import moment from 'moment';
-
-import { SimpleRenderer } from 'esri/renderers';
-import { defaultSymbol, LEGEND_COLORS, PRODUCTION, START_COORDINATES } from '../shared/constants';
+import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from '../shared/constants';
 import { DataType, IContainer, ICSVPoint } from '../shared/types';
 
 export const companyRenderer = new UniqueValueRenderer({
@@ -238,23 +237,5 @@ map.layers.add(featureLayer, 1);
 
 view.ui.add(locateWidget, 'top-left');
 view.ui.add('legendBlock', 'bottom-left');
-
-if (!PRODUCTION) {
-  setupDeveloperMode();
-}
-
-function setupDeveloperMode() {
-  view.on('click', clickEvent => {
-    // tslint:disable-next-line: no-console
-    console.debug('view', {
-      clickEvent,
-      latitude: clickEvent.mapPoint.latitude,
-      longitude: clickEvent.mapPoint.longitude,
-      scale: view.scale,
-      view,
-      zoom: view.zoom
-    });
-  });
-}
 
 export { view, map, featureLayer, locateWidget };
