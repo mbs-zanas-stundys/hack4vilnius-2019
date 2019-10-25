@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 
 import lt.vilnius.waste.container.Container;
 import lt.vilnius.waste.container.Pickup;
-import lt.metasite.waste.container.dto.*;
+import lt.vilnius.waste.container.dto.ContainerForDateView;
+import lt.vilnius.waste.container.dto.ContainerListView;
+import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
+import lt.vilnius.waste.container.dto.ContainerView;
+import lt.vilnius.waste.container.dto.PickupContainerView;
 
-import lt.vilnius.waste.container.dto.*;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -22,7 +25,6 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import static java.util.Collections.emptyList;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.geoNear;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
@@ -33,7 +35,6 @@ import static org.springframework.data.mongodb.core.aggregation.ArrayOperators.a
 import static org.springframework.data.mongodb.core.aggregation.ComparisonOperators.valueOf;
 import static org.springframework.data.mongodb.core.aggregation.ConditionalOperators.ifNull;
 import static org.springframework.data.mongodb.core.aggregation.ConditionalOperators.when;
-import static org.springframework.data.mongodb.core.aggregation.DateOperators.DateToString.dateOf;
 
 public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCustom {
 

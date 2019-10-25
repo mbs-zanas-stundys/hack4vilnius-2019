@@ -12,10 +12,10 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import lt.vilnius.waste.container.Schedule;
 import lt.vilnius.waste.commo.CsvUploadService;
-
+import lt.vilnius.waste.container.Schedule;
 import lt.vilnius.waste.container.repository.WasteContainerRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 

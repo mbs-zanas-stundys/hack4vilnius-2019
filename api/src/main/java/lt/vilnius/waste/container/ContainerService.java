@@ -3,7 +3,6 @@ package lt.vilnius.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.dto.*;
 import lt.vilnius.waste.container.dto.ContainerForDateView;
 import lt.vilnius.waste.container.dto.ContainerListView;
 import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;

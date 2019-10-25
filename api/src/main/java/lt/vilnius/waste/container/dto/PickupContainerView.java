@@ -1,11 +1,11 @@
 package lt.vilnius.waste.container.dto;
 
-import lt.vilnius.waste.container.PickupHistory;
-
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+
+import lt.vilnius.waste.container.PickupHistory;
 
 public class PickupContainerView extends ContainerListView{
 
