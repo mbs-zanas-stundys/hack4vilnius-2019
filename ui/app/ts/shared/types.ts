@@ -1,24 +1,53 @@
-export interface IContainerHistory {
-  date: '2019-09-18T18:23:15';
-  garbageTruckRegNo: 'KBE 709';
-  weight: 45;
+interface IGeoJsonPoint {
+  x: number;
+  y: number;
+  type: 'Point';
+  coordinates: [number, number];
+}
+
+export interface IContainerPickupHistoryDTO {
+  capacity: number;
+  containerNo: string;
+  date: Date;
+  garbageTruckNo: string;
+  id: string;
+  position: IGeoJsonPoint;
+  ratio: number;
+  weight: number;
+}
+
+export interface IContainerForDateDTO {
+  containerNo: string;
+  id: string;
+  missedPickup: boolean;
+  position: IGeoJsonPoint;
+}
+
+export type IContainerForMap = IContainerForDateDTO | IContainerPickupHistoryDTO;
+
+export interface IPickup {
+  date: string;
+  externalId: number;
+  garbageTruckRegNo: string;
+  weight: number;
+}
+
+export interface ISchedule {
+  expectedDate: string;
+  externalId: string;
 }
 
 export interface IContainerDTO {
   capacity: number;
   company: string;
   containerNo: string;
+  history: IPickup[];
   houseNo: string;
-  date: Date;
-  ratio: number;
-  weight: number;
-  garbageTruckNo: string;
-  history: IContainerHistory[];
   id: string;
   location: string;
-  position: { x: number; y: number; type: 'Point'; coordinates: [number, number] };
+  position: IGeoJsonPoint;
+  schedules: ISchedule[];
   street: string;
-  missedPickUp?: boolean;
 }
 
 export interface IContainer extends Omit<IContainerDTO, 'missedPickUp'> {

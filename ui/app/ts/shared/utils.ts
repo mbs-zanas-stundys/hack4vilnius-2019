@@ -1,9 +1,8 @@
 import PointGeometry from 'esri/geometry/Point';
 import Graphic from 'esri/Graphic';
-
 import { featureLayer, view } from '../components/map';
 import { API_BASE_URL } from './constants';
-import { IContainer } from './types';
+import { IContainerForMap } from './types';
 
 export const get = async <T = any>(
   url: string,
@@ -61,7 +60,7 @@ export const replaceMapFeatures = (features: Graphic[]) => {
   });
 };
 
-export const mapContainersToMapFeatures = (containers: IContainer[]): Graphic[] => {
+export const mapContainersToMapFeatures = (containers: IContainerForMap[]): Graphic[] => {
   return containers.map(
     c =>
       new Graphic({
@@ -76,7 +75,7 @@ export const mapContainersToMapFeatures = (containers: IContainer[]): Graphic[] 
 
 function constructUrl(pathParams: Record<string, any>, url: string): string {
   return Object.entries(pathParams).reduce(
-    (acc, [key, value]) => acc.replace(`:${key}`, value),
+    (acc, [key, value]) => acc.replace(`{${key}}`, value),
     url
   );
 }
@@ -88,5 +87,5 @@ function constructQueryParams(queryParams: Record<string, any>): string {
     return '';
   }
 
-  return entries.map(([key, value]) => `${encodeURI(key)}=${encodeURI(value)}`).join('&');
+  return '?' + entries.map(([key, value]) => `${encodeURI(key)}=${encodeURI(value)}`).join('&');
 }

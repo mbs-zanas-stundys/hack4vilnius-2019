@@ -10,7 +10,7 @@ export const API_ENDPOINTS = {
   }
 };
 
-export const DEBUG_MODE = true;
+export const DEBUG_MODE = false;
 export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
 export const COLORS = {
   error: '#FF4262',

@@ -1,9 +1,15 @@
-import { API_ENDPOINTS, FORMAT } from '@app-shared/constants';
-import { T } from '@app-shared/translations';
-import { IContainer, IContainerDTO, IContainerHistory } from '@app-shared/types';
-import { get } from '@app-shared/utils';
 import moment from 'moment';
 import 'moment/locale/lt';
+import { API_ENDPOINTS, FORMAT } from '../shared/constants';
+import { T } from '../shared/translations';
+import {
+  IContainer,
+  IContainerDTO,
+  IContainerForDateDTO,
+  IContainerPickupHistoryDTO,
+  IPickup
+} from '../shared/types';
+import { get } from '../shared/utils';
 
 const mapTo = {
   container: (dto: IContainerDTO): IContainer => {
@@ -11,7 +17,7 @@ const mapTo = {
       dto.history.sort((a, b) => b.date.localeCompare(a.date));
     }
 
-    const lastHistoryItem: IContainerHistory | undefined = dto.history && dto.history[0];
+    const lastHistoryItem: IPickup | undefined = dto.history && dto.history[0];
 
     return {
       ...dto,
@@ -27,9 +33,7 @@ const mapTo = {
         ? `${moment(lastHistoryItem.date).fromNow()}, ${moment(lastHistoryItem.date).format(
             FORMAT.dateWeekday
           )}`
-        : T.unknown,
-
-      missedPickUp: typeof dto.missedPickUp === 'boolean' ? String(dto.missedPickUp) : T.unknown
+        : T.unknown
     };
   }
 };
@@ -45,15 +49,13 @@ export default {
       containerNo
     }),
 
-  containersLowRatio: async (): Promise<IContainer[]> =>
-    get<IContainerDTO[]>(API_ENDPOINTS.container.lowRatioContainers).then(c =>
-      c.map(mapTo.container)
-    ),
+  containersLowRatio: async (): Promise<IContainerPickupHistoryDTO[]> =>
+    get<IContainerPickupHistoryDTO[]>(API_ENDPOINTS.container.lowRatioContainers),
 
-  containersMissedPickups: async (dateFor: string = '2019-09-16'): Promise<IContainer[]> =>
-    get<IContainerDTO[]>(API_ENDPOINTS.container.getMissedContainers, undefined, {
+  containersMissedPickups: async (
+    dateFor: string = '2019-09-16'
+  ): Promise<IContainerForDateDTO[]> =>
+    get<IContainerForDateDTO[]>(API_ENDPOINTS.container.getMissedContainers, undefined, {
       date: moment(dateFor).format(FORMAT.dateShort)
     })
-      .then(c => c.map(mapTo.container))
-      .catch(() => [])
 };

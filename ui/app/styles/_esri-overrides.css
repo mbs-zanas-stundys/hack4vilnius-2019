@@ -16,6 +16,7 @@
 .esri-widget table td:first-child {
   color: rgba(0, 0, 0, 0.58);
   padding-right: 1rem;
+  width: 10rem;
 }
 
 .esri-popup__navigation,

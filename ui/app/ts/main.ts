@@ -1,18 +1,16 @@
 import './components/container-history';
 import * as map from './components/map';
 
-import { T } from '@app-shared/translations';
-import { api } from 'api';
+import { api } from './api/index';
 import { DEBUG_MODE } from './shared/constants';
+import { T } from './shared/translations';
 import { DataType } from './shared/types';
 import { mapContainersToMapFeatures, replaceMapFeatures } from './shared/utils';
 
 const overlayElement = $('.overlay')!;
 const actionsOverlay = $('.actions-overlay')!;
 const btnFindLocation = $('#btn-find-location')!;
-const btnEnterAddress = $('#btn-enter-address')!;
 const overlayButtons = $('.overlay-buttons')!;
-const overlayForm = $('.overlay form')!;
 const btnShowMenu = $('#btn-show-menu')!;
 const btnShowMap = $('#btn-show-map')!;
 const btnShowButtons = $('#btn-show-buttons')!;
@@ -35,12 +33,6 @@ btnFindLocation.click(e => {
     });
 });
 
-btnEnterAddress.click(e => {
-  e.preventDefault();
-  overlayButtons.addClass('d-none');
-  overlayForm.removeClass('d-none');
-});
-
 btnShowMap.click(e => {
   e.preventDefault();
   fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
@@ -52,7 +44,6 @@ btnSubmitAddress.click(e => {
   fetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
   setTimeout(() => {
     overlayButtons.removeClass('d-none');
-    overlayForm.addClass('d-none');
   }, 300);
   hideOverlay();
 });
@@ -65,7 +56,6 @@ btnShowMenu.click(e => {
 btnShowButtons.click(e => {
   e.preventDefault();
   overlayButtons.removeClass('d-none');
-  overlayForm.addClass('d-none');
 });
 
 dataTypeSelect.change(() => {

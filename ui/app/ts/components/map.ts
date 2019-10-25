@@ -1,6 +1,3 @@
-import { COLORS, DEFAULT_SYMBOL, DOM, FORMAT, START_COORDINATES } from '@app-shared/constants';
-import { T } from '@app-shared/translations';
-import { DataType, IContainer, ICSVPoint, Unit } from '@app-shared/types';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import EsriMap from 'esri/Map';
 import { SimpleRenderer } from 'esri/renderers';
@@ -9,6 +6,17 @@ import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
 import LocateWidget from 'esri/widgets/Locate';
 import moment from 'moment';
+import { COLORS, DEFAULT_SYMBOL, DOM, FORMAT, START_COORDINATES } from '../shared/constants';
+import { T } from '../shared/translations';
+import {
+  DataType,
+  IContainer,
+  IContainerForDateDTO,
+  IContainerForMap,
+  IContainerPickupHistoryDTO,
+  ICSVPoint,
+  Unit
+} from '../shared/types';
 
 export const unloadRenderer = new UniqueValueRenderer({
   defaultSymbol: DEFAULT_SYMBOL.clone(),
@@ -84,7 +92,7 @@ const map = new EsriMap({
 const view = new MapView({
   center: START_COORDINATES,
   constraints: {
-    minZoom: 14,
+    minZoom: 12,
     snapToZoom: false
   },
   container: DOM.mapId,
@@ -166,37 +174,38 @@ const featureLayer = new FeatureLayer({
   objectIdField: 'id' as keyof IContainer,
   popupEnabled: true,
   popupTemplate: {
-    content: (point: ICSVPoint<IContainer>) => {
-      const a = point.graphic.attributes;
+    content: (point: ICSVPoint<IContainerForMap>) => {
       const dataType = $(DOM.containerDataTypeIdSelector).val() as DataType;
 
       const dataByType: Record<DataType, () => void> = {
-        [DataType.missedPickups]: () =>
-          `<container-history container-no="${a.containerNo}"></container-history>`,
-        [DataType.unloadRatio]: () => `
-          <table>
-            <tr><td>${T.lastUnloadShortDate}</td><td>${moment(a.date).format(
-          FORMAT.dateShort
-        )}</td></tr>
-            <tr><td>${T.lastUnloadShortWeight}</td><td>${a.weight} ${Unit.Kilograms}</td></tr>
-            <tr><td>${T.containerCapacity}</td><td>${a.capacity} ${Unit.CubicMeters}</td></tr>
-            <tr><td>${T.unloadShortRatio}</td><td>${Math.round(a.ratio * 100) / 100} ${
-          Unit.KgsPerCubicMeter
-        }</td></tr>
-          </table>
-        `
+        [DataType.missedPickups]: () => {
+          const a = point.graphic.attributes as IContainerForDateDTO;
+          return `<container-history container-no="${a.containerNo}"></container-history>`;
+        },
+        [DataType.unloadRatio]: () => {
+          const a = point.graphic.attributes as IContainerPickupHistoryDTO;
+
+          return `
+            <table>
+              <tr><td>${T.lastUnloadShortDate}</td><td>${moment(a.date).format(
+            FORMAT.dateShort
+          )}</td></tr>
+              <tr><td>${T.lastUnloadShortWeight}</td><td>${a.weight} ${Unit.Kilograms}</td></tr>
+              <tr><td>${T.containerCapacity}</td><td>${a.capacity} ${Unit.CubicMeters}</td></tr>
+              <tr><td>${T.unloadShortRatio}</td><td>${Math.round(a.ratio * 100) / 100} ${
+            Unit.KgsPerCubicMeter
+          }</td></tr>
+            </table>
+            <br/>
+            <container-history container-no="${a.containerNo}"></container-history>
+          `;
+        }
       };
       return dataByType[dataType]();
     },
     outFields: ['*'],
-    title: (point: ICSVPoint<IContainer>) => {
-      return (
-        point.graphic.attributes.containerNo +
-        ' — ' +
-        point.graphic.attributes.street +
-        ' ' +
-        point.graphic.attributes.houseNo
-      );
+    title: (point: ICSVPoint<IContainerForMap>) => {
+      return point.graphic.attributes.containerNo;
     }
   },
   renderer: new SimpleRenderer(),

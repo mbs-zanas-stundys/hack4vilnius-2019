@@ -37,7 +37,6 @@
 }
 
 #logo {
-  margin-top: 7rem;
   margin-bottom: 0.5rem;
   width: 190px;
 }
@@ -65,11 +64,6 @@
 
 .actions-overlay > * {
   pointer-events: all;
-}
-
-.overlay-buttons,
-.overlay-form {
-  height: 300px;
 }
 
 .overlay h1,
