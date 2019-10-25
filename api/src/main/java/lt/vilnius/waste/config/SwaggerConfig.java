@@ -16,7 +16,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("lt.metasite.waste"))
+                .apis(RequestHandlerSelectors.basePackage("lt.vilnius.waste"))
                 .paths(PathSelectors.any())
                 .build();
     }
