@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import lt.vilnius.waste.commo.CsvUploadService;
 import lt.vilnius.waste.container.Container;
 import lt.vilnius.waste.container.repository.WasteContainerRepository;
-import lt.vilnius.waste.commo.CsvUploadService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

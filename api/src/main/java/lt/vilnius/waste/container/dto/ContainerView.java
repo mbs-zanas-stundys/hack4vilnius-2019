@@ -1,10 +1,11 @@
 package lt.vilnius.waste.container.dto;
 
+import java.util.List;
+
 import lt.vilnius.waste.container.Pickup;
 import lt.vilnius.waste.container.Schedule;
-import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
-import java.util.List;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 public class ContainerView {
 

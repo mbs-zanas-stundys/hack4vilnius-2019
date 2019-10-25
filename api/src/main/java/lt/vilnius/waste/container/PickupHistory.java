@@ -1,7 +1,9 @@
 package lt.vilnius.waste.container;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class PickupHistory {
     private LocalDate date;

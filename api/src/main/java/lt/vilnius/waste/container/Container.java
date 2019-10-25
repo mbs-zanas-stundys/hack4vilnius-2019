@@ -1,16 +1,16 @@
 package lt.vilnius.waste.container;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 

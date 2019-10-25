@@ -3,12 +3,11 @@ package lt.vilnius.waste.container;
 import java.time.LocalDate;
 import java.util.List;
 
-import lt.metasite.waste.container.dto.*;
-
 import lt.vilnius.waste.container.dto.ContainerForDateView;
 import lt.vilnius.waste.container.dto.ContainerListView;
 import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
 import lt.vilnius.waste.container.dto.ContainerView;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
