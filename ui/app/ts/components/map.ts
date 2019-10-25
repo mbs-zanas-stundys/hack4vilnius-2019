@@ -1,3 +1,6 @@
+import { COLORS, DEFAULT_SYMBOL, DOM, FORMAT, START_COORDINATES } from '@app-shared/constants';
+import { T } from '@app-shared/translations';
+import { DataType, IContainer, ICSVPoint, Unit } from '@app-shared/types';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import EsriMap from 'esri/Map';
 import { SimpleRenderer } from 'esri/renderers';
@@ -6,70 +9,43 @@ import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
 import LocateWidget from 'esri/widgets/Locate';
 import moment from 'moment';
-import { defaultSymbol, LEGEND_COLORS, START_COORDINATES } from '../shared/constants';
-import { DataType, IContainer, ICSVPoint } from '../shared/types';
-
-export const companyRenderer = new UniqueValueRenderer({
-  defaultLabel: 'Nežinoma',
-  field: 'company' as keyof IContainer,
-  legendOptions: {
-    title: 'Paskutinis išvežimas'
-  },
-  uniqueValueInfos: [
-    {
-      label: 'VSA Vilnius',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0]),
-      value: 'VSA Vilnius'
-    },
-    {
-      label: 'Ekonovus',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[1]),
-      value: 'Ekonovus'
-    },
-    {
-      label: 'Ecoservice',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3]),
-      value: 'Ecoservice'
-    }
-  ]
-});
 
 export const unloadRenderer = new UniqueValueRenderer({
-  defaultSymbol: defaultSymbol.clone(),
+  defaultSymbol: DEFAULT_SYMBOL.clone(),
   field: 'ratio' as keyof IContainer,
   legendOptions: {
-    title: 'Paskutinis išvežimas'
+    title: T.lastUnload
   },
   visualVariables: [
     new ColorVariable({
       field: 'ratio' as keyof IContainer,
       legendOptions: {
-        title: 'Paskutinis išvežimas'
+        title: T.lastUnload
       },
       stops: [
         {
-          color: LEGEND_COLORS[3],
-          label: '<2.5 kg/m³',
+          color: COLORS.error,
+          label: '<2.5 ' + Unit.KgsPerCubicMeter,
           value: 0
         },
         {
-          color: LEGEND_COLORS[1],
-          label: '2.5 — 5.0 kg/m³',
+          color: COLORS.warning,
+          label: '2.5 — 5.0 ' + Unit.KgsPerCubicMeter,
           value: 2.5
         },
         {
-          color: LEGEND_COLORS[0],
-          label: '5 — 7.5 kg/m³',
+          color: COLORS.primary,
+          label: '5 — 7.5 ' + Unit.KgsPerCubicMeter,
           value: 5
         },
         {
-          color: LEGEND_COLORS[2],
-          label: '7.5 - 10.0 kg/m³',
+          color: COLORS.secondary,
+          label: '7.5 - 10.0 ' + Unit.KgsPerCubicMeter,
           value: 7.5
         },
         {
-          color: LEGEND_COLORS[2],
-          label: '>10.0 kg/m³',
+          color: COLORS.secondary,
+          label: '>10.0 ' + Unit.KgsPerCubicMeter,
           value: 10
         }
       ]
@@ -80,26 +56,25 @@ export const unloadRenderer = new UniqueValueRenderer({
 export const missedPickUpRenderer = new UniqueValueRenderer({
   field: 'missedPickUp' as keyof IContainer,
   legendOptions: {
-    title: 'Praleisti vėžimai'
+    title: T.missedUnloads
   },
   uniqueValueInfos: [
     {
-      label: 'Nepraleista',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[0]),
+      label: T.notMissed,
+      symbol: DEFAULT_SYMBOL.clone().set('color', COLORS.primary),
       value: 'false'
     },
     {
-      label: 'Praleista',
-      symbol: defaultSymbol.clone().set('color', LEGEND_COLORS[3]),
+      label: T.missed,
+      symbol: DEFAULT_SYMBOL.clone().set('color', COLORS.error),
       value: 'true'
     },
     {
-      label: 'Nežinoma',
-      symbol: defaultSymbol.clone().set('color', '#ccc'),
-      value: 'Nežinoma'
+      label: T.unknown,
+      symbol: DEFAULT_SYMBOL.clone().set('color', COLORS.grey),
+      value: T.unknown
     }
   ]
-  // defaultSymbol: defaultSymbol.clone()
 });
 
 const map = new EsriMap({
@@ -112,7 +87,7 @@ const view = new MapView({
     minZoom: 14,
     snapToZoom: false
   },
-  container: 'mapBlock',
+  container: DOM.mapId,
   map,
   ui: {
     components: []
@@ -193,24 +168,23 @@ const featureLayer = new FeatureLayer({
   popupTemplate: {
     content: (point: ICSVPoint<IContainer>) => {
       const a = point.graphic.attributes;
-      const dataType = $('#container-data-type').val() as DataType;
+      const dataType = $(DOM.containerDataTypeIdSelector).val() as DataType;
+
       const dataByType: Record<DataType, () => void> = {
-        [DataType.lastUnload]: () => {
-          return `<container-history container-no="${a.containerNo}"></container-history>`;
-        },
-        [DataType.missedPickups]: () => {
-          return `<container-history container-no="${a.containerNo}"></container-history>`;
-        },
-        [DataType.unloadRatio]: () => {
-          return `
-            <table>
-              <tr><td>Pask. vėžimo data</td><td>${moment(a.date).format('YYYY-MM-DD')}</td></tr>
-              <tr><td>Pask. vėžimo svoris</td><td>${a.weight} kg</td></tr>
-              <tr><td>Konteinerio talpa</td><td>${a.capacity} m³</td></tr>
-              <tr><td>Iškr. santykis</td><td>${Math.round(a.ratio * 100) / 100} kg/m³</td></tr>
-            </table>
-          `;
-        }
+        [DataType.missedPickups]: () =>
+          `<container-history container-no="${a.containerNo}"></container-history>`,
+        [DataType.unloadRatio]: () => `
+          <table>
+            <tr><td>${T.lastUnloadShortDate}</td><td>${moment(a.date).format(
+          FORMAT.dateShort
+        )}</td></tr>
+            <tr><td>${T.lastUnloadShortWeight}</td><td>${a.weight} ${Unit.Kilograms}</td></tr>
+            <tr><td>${T.containerCapacity}</td><td>${a.capacity} ${Unit.CubicMeters}</td></tr>
+            <tr><td>${T.unloadShortRatio}</td><td>${Math.round(a.ratio * 100) / 100} ${
+          Unit.KgsPerCubicMeter
+        }</td></tr>
+          </table>
+        `
       };
       return dataByType[dataType]();
     },
@@ -236,6 +210,6 @@ const featureLayer = new FeatureLayer({
 map.layers.add(featureLayer, 1);
 
 view.ui.add(locateWidget, 'top-left');
-view.ui.add('legendBlock', 'bottom-left');
+view.ui.add(DOM.legendBlockId, 'bottom-left');
 
 export { view, map, featureLayer, locateWidget };

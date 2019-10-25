@@ -1,8 +1,11 @@
+import { FORMAT } from '@app-shared/constants';
+import { T } from '@app-shared/translations';
+import { IContainer } from '@app-shared/types';
+import { api } from 'api';
 import moment = require('moment');
-import { api } from '../shared/api';
 
 class ContainerHistoryElement extends HTMLElement {
-  constructor(props) {
+  constructor() {
     super();
 
     const containerNo = this.getAttribute('container-no') || '';
@@ -10,31 +13,33 @@ class ContainerHistoryElement extends HTMLElement {
     if (containerNo) {
       this.innerHTML = '<span class="loader"></span>';
 
-      Promise.all([api.containerDetails(containerNo), api.containerSchedule(containerNo)]).then(
-        ([res, schedule]) => {
-          this.innerHTML = `
+      Promise.all([
+        api.containers.containerDetails(containerNo),
+        api.containers.containerHistory(containerNo)
+      ]).then(([res, schedule]) => {
+        this.innerHTML = this.makeTable(res, schedule);
+      });
+    }
+  }
+
+  private makeTable(res: IContainer, schedule: any): string {
+    return `
           <table>
-            <tr><td>Gatvė</td><td>${res.street}</td></tr>
-            <tr><td>Namas</td><td>${res.houseNo}</td></tr>
-            <tr><td>Vietovė</td><td>${res.location}</td></tr>
-            <tr><td>Talpa</td><td>${res.capacity} m³</td></tr>
-            <tr><td>Vežėjas</td><td>${res.company}</td></tr>
-            
-            <tr><td>Pask. išvėžimas</td><td title="${res.lastUnload}">${
-            res.lastUnloadWords
-          }</td></tr>
-            <tr><td>Sekantys vėžimai</td><td>${
-              schedule.length
-                ? schedule
-                    .map(s => moment(s.expectedDate).format('YYYY-MM-DD[, ] dddd'))
-                    .join('<br/>')
-                : 'Nėra'
-            }</td></tr>
+            <tr><td>${T.street}</td><td>${res.street}</td></tr>
+            <tr><td>${T.house}</td><td>${res.houseNo}</td></tr>
+            <tr><td>${T.place}</td><td>${res.location}</td></tr>
+            <tr><td>${T.capacity}</td><td>${res.capacity} m³</td></tr>
+            <tr><td>${T.carrier}</td><td>${res.company}</td></tr>
+            <tr><td>${T.lastUnloadShort}</td><td title="${res.lastUnload}">${
+      res.lastUnloadWords
+    }</td></tr>
+                <tr><td>${T.nextUnloads}</td><td>${
+      schedule.length
+        ? schedule.map(s => moment(s.expectedDate).format(FORMAT.dateDisplay)).join('<br/>')
+        : T.none
+    }</td></tr>
           </table>
         `;
-        }
-      );
-    }
   }
 }
 

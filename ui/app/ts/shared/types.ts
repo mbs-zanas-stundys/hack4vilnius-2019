@@ -34,17 +34,13 @@ export interface ICSVPoint<T> {
   };
 }
 
-export interface ISchedule {
-  id: string;
-  containerNo: string;
-  company: string;
-  expectedDate: string;
-  actualDate?: string;
-  completed?: boolean;
-}
-
 export enum DataType {
-  lastUnload = 'last-unload',
   unloadRatio = 'unload-ratio',
   missedPickups = 'missed-pickups'
+}
+
+export enum Unit {
+  Kilograms = 'kg',
+  CubicMeters = 'm³',
+  KgsPerCubicMeter = 'kg/m³'
 }

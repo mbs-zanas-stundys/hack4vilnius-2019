@@ -1,20 +1,16 @@
 import './components/container-history';
 import * as map from './components/map';
-import { api } from './shared/api';
-import { DEBUG_MODE, SEARCH_RADIUS } from './shared/constants';
-import { DataType } from './shared/types';
-import {
-  debounce,
-  mapContainersToMapFeatures,
-  onMapInteract,
-  replaceMapFeatures
-} from './shared/utils';
 
-const debouncedFetchFeaturesByCoords = debounce(fetchFeaturesByCoords, 300, false);
+import { T } from '@app-shared/translations';
+import { api } from 'api';
+import { DEBUG_MODE } from './shared/constants';
+import { DataType } from './shared/types';
+import { mapContainersToMapFeatures, replaceMapFeatures } from './shared/utils';
+
 const overlayElement = $('.overlay')!;
 const actionsOverlay = $('.actions-overlay')!;
 const btnFindLocation = $('#btn-find-location')!;
-const btnEnterAdress = $('#btn-enter-address')!;
+const btnEnterAddress = $('#btn-enter-address')!;
 const overlayButtons = $('.overlay-buttons')!;
 const overlayForm = $('.overlay form')!;
 const btnShowMenu = $('#btn-show-menu')!;
@@ -35,11 +31,11 @@ btnFindLocation.click(e => {
     .then(() => hideOverlay())
     .catch(() => {
       btnFindLocation.removeClass('loading');
-      alert('Nepavyko nustatyti jūsų pozicijos. Bandykite dar kartą');
+      alert(T.geolocationFailed);
     });
 });
 
-btnEnterAdress.click(e => {
+btnEnterAddress.click(e => {
   e.preventDefault();
   overlayButtons.addClass('d-none');
   overlayForm.removeClass('d-none');
@@ -95,7 +91,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
   const value = dataTypeSelect.val() as DataType;
 
   const addLegendClasses = () => {
-    legendBlock.removeClass(Object.values(DataType).map(t => 'legend--' + t));
+    legendBlock.removeClass(Object.values(DataType).map(dt => 'legend--' + dt));
     legendBlock.addClass('legend--' + value);
   };
 
@@ -110,24 +106,8 @@ function fetchFeaturesByCoords(latitude, longitude) {
   startLoading();
 
   const dataByType: Record<DataType, () => void> = {
-    [DataType.lastUnload]: () => {
-      api
-        .containersByCoordinates(
-          latitude,
-          longitude,
-          Math.max(map.view.extent.height, map.view.extent.width, SEARCH_RADIUS) / 2
-        )
-        .then(containers => {
-          const features = mapContainersToMapFeatures(containers);
-
-          map.featureLayer.set('renderer', map.companyRenderer);
-          replaceMapFeatures(features);
-          addLegendClasses();
-          stopLoading();
-        });
-    },
     [DataType.unloadRatio]: () => {
-      api.containersLowRatio().then(containers => {
+      api.containers.containersLowRatio().then(containers => {
         const features = mapContainersToMapFeatures(containers);
 
         map.featureLayer.set('renderer', map.unloadRenderer);
@@ -137,7 +117,7 @@ function fetchFeaturesByCoords(latitude, longitude) {
       });
     },
     [DataType.missedPickups]: () => {
-      api.containersMissedPickups().then(containers => {
+      api.containers.containersMissedPickups().then(containers => {
         const features = mapContainersToMapFeatures(containers);
 
         map.featureLayer.set('renderer', map.missedPickUpRenderer);
@@ -168,15 +148,6 @@ function setupDevMode() {
     });
   });
 }
-
-map.view.when(() => {
-  onMapInteract(() => {
-    const value = dataTypeSelect.val() as DataType;
-    if (value === DataType.lastUnload) {
-      debouncedFetchFeaturesByCoords(map.view.center.latitude, map.view.center.longitude);
-    }
-  });
-});
 
 if (DEBUG_MODE) {
   setupDevMode();

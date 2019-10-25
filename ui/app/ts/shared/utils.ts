@@ -2,28 +2,17 @@ import PointGeometry from 'esri/geometry/Point';
 import Graphic from 'esri/Graphic';
 
 import { featureLayer, view } from '../components/map';
+import { API_BASE_URL } from './constants';
 import { IContainer } from './types';
 
 export const get = async <T = any>(
   url: string,
   pathParams: Record<string, any> = {},
-  params: Record<string, any> = {}
+  queryParams: Record<string, any> = {}
 ): Promise<T> => {
-  const baseUrl = 'http://localhost:8080';
-  let httpParams = Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
-
-  let constructedPath = url;
-  Object.entries(pathParams).forEach(
-    ([key, value]) => (constructedPath = constructedPath.replace(`:${key}`, value))
-  );
-
-  if (httpParams) {
-    httpParams = '?' + httpParams;
-  }
-
-  const res = await fetch(baseUrl + constructedPath + httpParams);
+  const httpParams = constructQueryParams(queryParams);
+  const constructedPath = constructUrl(pathParams, url);
+  const res = await fetch(API_BASE_URL + constructedPath + httpParams);
 
   return await res.json();
 };
@@ -48,7 +37,7 @@ export const debounce = <T extends (...args: any) => void>(func: T, wait: number
   } as any;
 };
 
-export const onMapInteract = callback => {
+export const onMapInteract = (callback: () => void) => {
   view.on('drag', () => {
     callback();
   });
@@ -84,3 +73,20 @@ export const mapContainersToMapFeatures = (containers: IContainer[]): Graphic[] 
       })
   );
 };
+
+function constructUrl(pathParams: Record<string, any>, url: string): string {
+  return Object.entries(pathParams).reduce(
+    (acc, [key, value]) => acc.replace(`:${key}`, value),
+    url
+  );
+}
+
+function constructQueryParams(queryParams: Record<string, any>): string {
+  const entries = Object.entries(queryParams);
+
+  if (!entries.length) {
+    return '';
+  }
+
+  return entries.map(([key, value]) => `${encodeURI(key)}=${encodeURI(value)}`).join('&');
+}

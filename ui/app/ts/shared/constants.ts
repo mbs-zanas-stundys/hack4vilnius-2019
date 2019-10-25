@@ -1,11 +1,39 @@
 import { SimpleMarkerSymbol } from 'esri/symbols';
 
-export const DEBUG_MODE = true;
-export const SEARCH_RADIUS = 500;
-export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
-export const LEGEND_COLORS = ['#43A047', '#FDC010', '#009DFF', '#FF4262'];
+export const API_BASE_URL = 'http://localhost:8080';
+export const API_ENDPOINTS = {
+  container: {
+    getContainer: '/containers/{containerNo}',
+    getContainerPickupHistory: '/containers/{containerNo}/history',
+    getMissedContainers: '/containers/pickup',
+    lowRatioContainers: '/containers/low-ratio'
+  }
+};
 
-export const defaultSymbol = new SimpleMarkerSymbol({
+export const DEBUG_MODE = true;
+export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
+export const COLORS = {
+  error: '#FF4262',
+  grey: '#ccc',
+  primary: '#43A047',
+  secondary: '#009DFF',
+  warning: '#FDC010'
+};
+
+export const FORMAT = {
+  dateDisplay: 'YYYY-MM-DD[, ] dddd',
+  dateShort: 'YYYY-MM-DD',
+  dateTime: 'YYYY-MM-DD HH:mm',
+  dateWeekday: 'dddd'
+};
+
+export const DOM = {
+  containerDataTypeIdSelector: '#container-data-type',
+  legendBlockId: 'legendBlock',
+  mapId: 'mapBlock'
+};
+
+export const DEFAULT_SYMBOL = new SimpleMarkerSymbol({
   outline: {
     color: 'white',
     width: 0.5
