@@ -1,19 +1,14 @@
 package lt.vilnius.waste.container;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import lt.vilnius.waste.container.dto.ContainerForDateView;
 import lt.vilnius.waste.container.dto.ContainerListView;
 import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
 import lt.vilnius.waste.container.dto.ContainerView;
-
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/containers")
@@ -39,7 +34,7 @@ public class ContainerController {
 
     @GetMapping("/{containerNo}/history")
     public List<Pickup> getContainerPickupHistory(@PathVariable String containerNo,
-                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         if (date == null) {
             date = LocalDate.now();
         }
@@ -47,9 +42,9 @@ public class ContainerController {
     }
 
     @GetMapping("/pickup")
-    public List<ContainerForDateView> getMissedContainers(@RequestParam(required = false) @DateTimeFormat(iso =
-            DateTimeFormat.ISO.DATE) LocalDate date) {
-        if(date == null){
+    public List<ContainerForDateView> getMissedContainers(@RequestParam(required = false)
+                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if (date == null) {
             date = LocalDate.now();
         }
         return service.pickupsForDate(date);
