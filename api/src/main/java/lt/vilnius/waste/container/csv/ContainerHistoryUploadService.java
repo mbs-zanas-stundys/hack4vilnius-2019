@@ -1,28 +1,21 @@
 package lt.vilnius.waste.container.csv;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.stream.StreamSupport;
-
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
 import lt.vilnius.waste.commo.CsvUploadService;
 import lt.vilnius.waste.container.Pickup;
 import lt.vilnius.waste.container.repository.WasteContainerRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ContainerHistoryUploadService implements CsvUploadService {
@@ -53,7 +46,7 @@ public class ContainerHistoryUploadService implements CsvUploadService {
             StreamSupport.stream(csvToBean.spliterator(), true)
                     .map(this::fromCsv)
                     .forEach(p -> repository.findByContainerNo(p.getFirst())
-                            .map(h -> h.withHistory(LocalDate.now().withDayOfMonth(1), p.getSecond()))
+                            .map(h -> h.withHistory(p.getSecond()))
                             .ifPresent(repository::save));
 
             LOGGER.info("Upload finished");

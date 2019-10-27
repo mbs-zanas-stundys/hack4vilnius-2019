@@ -1,16 +1,17 @@
 package lt.vilnius.waste.container;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 
@@ -31,6 +32,11 @@ public class Container {
     private List<PickupHistory> history;
     private List<ScheduleHistory> schedule;
 
+    public Container withSchedules(Map<LocalDate, List<Schedule>> schedules){
+        schedules.forEach(this::withSchedules);
+        return this;
+    }
+
     public Container withSchedules(LocalDate date, List<Schedule> schedule){
         Stream.ofNullable(this.schedule)
                 .flatMap(Collection::stream)
@@ -41,7 +47,8 @@ public class Container {
         return this;
     }
 
-    public Container withHistory(LocalDate date, Pickup pickup){
+    public Container withHistory(Pickup pickup){
+        LocalDate date = pickup.getDate().toLocalDate().withDayOfMonth(1);
         Stream.ofNullable(history)
                 .flatMap(Collection::stream)
                 .filter(s->s.getDate().equals(date))

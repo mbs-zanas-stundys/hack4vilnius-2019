@@ -1,30 +1,24 @@
 package lt.vilnius.waste.container.csv;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import lt.vilnius.waste.commo.CsvUploadService;
+import lt.vilnius.waste.container.Schedule;
+import lt.vilnius.waste.container.repository.WasteContainerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.StreamSupport;
 
-import lt.vilnius.waste.commo.CsvUploadService;
-import lt.vilnius.waste.container.Schedule;
-import lt.vilnius.waste.container.repository.WasteContainerRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
-
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class ScheduleUploadService implements CsvUploadService {
@@ -74,10 +68,12 @@ public class ScheduleUploadService implements CsvUploadService {
     }
 
     private void saveSchedules(String containerNo, List<ScheduleCsvDto> scheduleCsvDtos){
-        repository.findByContainerNo(containerNo)
-                .map(c -> c.withSchedules(LocalDate.now().withDayOfMonth(1), scheduleCsvDtos.stream()
+        Map<LocalDate, List<Schedule>> schedules =
+                scheduleCsvDtos.stream()
                         .map(this::fromCsv)
-                        .collect(toList())))
+                        .collect(groupingBy(i -> i.getExpectedDate().withDayOfMonth(1)));
+        repository.findByContainerNo(containerNo)
+                .map(c -> c.withSchedules(schedules))
                 .ifPresent(repository::save);
     }
 
