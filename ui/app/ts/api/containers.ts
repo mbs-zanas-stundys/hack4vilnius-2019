@@ -1,13 +1,14 @@
 import moment from 'moment';
 import 'moment/locale/lt';
-import { API_ENDPOINTS, FORMAT } from '../shared/constants';
+import { API_ENDPOINTS, DATE_WITH_DATA, FORMAT } from '../shared/constants';
 import { T } from '../shared/translations';
 import {
   IContainer,
   IContainerDTO,
-  IContainerForDateDTO,
-  IContainerPickupHistoryDTO,
-  IPickup
+  IMissedPickupContainer,
+  IMissedPickupContainerDTO,
+  IPickup,
+  IUnloadRatioContainer
 } from '../shared/types';
 import { get } from '../shared/utils';
 
@@ -35,6 +36,12 @@ const mapTo = {
           )}`
         : T.unknown
     };
+  },
+  missedContainer: (dto: IMissedPickupContainerDTO): IMissedPickupContainer => {
+    return {
+      ...dto,
+      missedPickup: String(dto.missedPickup)
+    };
   }
 };
 
@@ -49,13 +56,15 @@ export default {
       containerNo
     }),
 
-  containersLowRatio: async (): Promise<IContainerPickupHistoryDTO[]> =>
-    get<IContainerPickupHistoryDTO[]>(API_ENDPOINTS.container.lowRatioContainers),
+  containersLowRatio: async (dateFor: string = DATE_WITH_DATA): Promise<IUnloadRatioContainer[]> =>
+    get<IUnloadRatioContainer[]>(API_ENDPOINTS.container.lowRatioContainers, undefined, {
+      date: moment(dateFor).format(FORMAT.dateShort)
+    }),
 
   containersMissedPickups: async (
-    dateFor: string = '2019-09-16'
-  ): Promise<IContainerForDateDTO[]> =>
-    get<IContainerForDateDTO[]>(API_ENDPOINTS.container.getMissedContainers, undefined, {
+    dateFor: string = DATE_WITH_DATA
+  ): Promise<IMissedPickupContainer[]> =>
+    get<IMissedPickupContainerDTO[]>(API_ENDPOINTS.container.getMissedContainers, undefined, {
       date: moment(dateFor).format(FORMAT.dateShort)
-    })
+    }).then(pickups => pickups.map(mapTo.missedContainer))
 };

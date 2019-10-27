@@ -4,17 +4,26 @@ import { SimpleRenderer } from 'esri/renderers';
 import UniqueValueRenderer from 'esri/renderers/UniqueValueRenderer';
 import ColorVariable from 'esri/renderers/visualVariables/ColorVariable';
 import MapView from 'esri/views/MapView';
+import LegendWidget from 'esri/widgets/Legend';
 import LocateWidget from 'esri/widgets/Locate';
 import moment from 'moment';
-import { COLORS, DEFAULT_SYMBOL, DOM, FORMAT, START_COORDINATES } from '../shared/constants';
+import {
+  COLORS,
+  DEFAULT_SYMBOL,
+  DOM,
+  FORMAT,
+  MAP_INITIAL_ZOOM,
+  MAP_MIN_ZOOM,
+  START_COORDINATES
+} from '../shared/constants';
 import { T } from '../shared/translations';
 import {
   DataType,
   IContainer,
-  IContainerForDateDTO,
   IContainerForMap,
-  IContainerPickupHistoryDTO,
   ICSVPoint,
+  IMissedPickupContainer,
+  IUnloadRatioContainer,
   Unit
 } from '../shared/types';
 
@@ -92,7 +101,7 @@ const map = new EsriMap({
 const view = new MapView({
   center: START_COORDINATES,
   constraints: {
-    minZoom: 12,
+    minZoom: MAP_MIN_ZOOM,
     snapToZoom: false
   },
   container: DOM.mapId,
@@ -100,7 +109,7 @@ const view = new MapView({
   ui: {
     components: []
   },
-  zoom: 16
+  zoom: MAP_INITIAL_ZOOM
 });
 
 const locateWidget = new LocateWidget({
@@ -179,11 +188,11 @@ const featureLayer = new FeatureLayer({
 
       const dataByType: Record<DataType, () => void> = {
         [DataType.missedPickups]: () => {
-          const a = point.graphic.attributes as IContainerForDateDTO;
+          const a = point.graphic.attributes as IMissedPickupContainer;
           return `<container-history container-no="${a.containerNo}"></container-history>`;
         },
         [DataType.unloadRatio]: () => {
-          const a = point.graphic.attributes as IContainerPickupHistoryDTO;
+          const a = point.graphic.attributes as IUnloadRatioContainer;
 
           return `
             <table>
@@ -217,6 +226,12 @@ const featureLayer = new FeatureLayer({
 });
 
 map.layers.add(featureLayer, 1);
+
+// tslint:disable-next-line: no-unused-expression
+new LegendWidget({
+  container: DOM.legendContentBlockId,
+  view
+});
 
 view.ui.add(locateWidget, 'top-left');
 view.ui.add(DOM.legendBlockId, 'bottom-left');

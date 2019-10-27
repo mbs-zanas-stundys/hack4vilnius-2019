@@ -5,7 +5,7 @@ interface IGeoJsonPoint {
   coordinates: [number, number];
 }
 
-export interface IContainerPickupHistoryDTO {
+export interface IUnloadRatioContainer {
   capacity: number;
   containerNo: string;
   date: Date;
@@ -16,14 +16,18 @@ export interface IContainerPickupHistoryDTO {
   weight: number;
 }
 
-export interface IContainerForDateDTO {
+export interface IMissedPickupContainerDTO {
   containerNo: string;
   id: string;
   missedPickup: boolean;
   position: IGeoJsonPoint;
 }
 
-export type IContainerForMap = IContainerForDateDTO | IContainerPickupHistoryDTO;
+export interface IMissedPickupContainer extends Omit<IMissedPickupContainerDTO, 'missedPickup'> {
+  missedPickup: string;
+}
+
+export type IContainerForMap = IMissedPickupContainer | IUnloadRatioContainer;
 
 export interface IPickup {
   date: string;

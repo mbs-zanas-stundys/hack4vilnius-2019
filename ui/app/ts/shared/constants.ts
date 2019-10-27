@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
 
 export const DEBUG_MODE = false;
 export const START_COORDINATES = [25.277049088433326, 54.686439174502574];
+export const DATE_WITH_DATA = '2019-09-16';
 export const COLORS = {
   error: '#FF4262',
   grey: '#ccc',
@@ -19,6 +20,8 @@ export const COLORS = {
   secondary: '#009DFF',
   warning: '#FDC010'
 };
+export const MAP_MIN_ZOOM = 12;
+export const MAP_INITIAL_ZOOM = 16;
 
 export const FORMAT = {
   dateDisplay: 'YYYY-MM-DD[, ] dddd',
@@ -30,6 +33,7 @@ export const FORMAT = {
 export const DOM = {
   containerDataTypeIdSelector: '#container-data-type',
   legendBlockId: 'legendBlock',
+  legendContentBlockId: 'legendContentBlock',
   mapId: 'mapBlock'
 };
 
