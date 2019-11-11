@@ -1,4 +1,4 @@
-package lt.vilnius.waste.container.dto;
+package lt.vilnius.waste.container.value;
 
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 

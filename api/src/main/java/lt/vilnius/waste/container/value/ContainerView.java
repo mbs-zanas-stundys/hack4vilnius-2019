@@ -1,24 +1,21 @@
-package lt.vilnius.waste.container.dto;
-
-import java.util.List;
+package lt.vilnius.waste.container.value;
 
 import lt.vilnius.waste.container.Pickup;
-import lt.vilnius.waste.container.Schedule;
-
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 public class ContainerView {
 
     private String id;
     private String containerNo;
     private GeoJsonPoint position;
-    private String street;
-    private String company;
-    private String location;
-    private String houseNo;
+    private String address;
     private Double capacity;
     private List<Pickup> history;
-    private List<Schedule> schedules;
+    private Set<LocalDate> schedules;
 
     public String getId() {
         return id;
@@ -44,38 +41,6 @@ public class ContainerView {
         this.position = position;
     }
 
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getHouseNo() {
-        return houseNo;
-    }
-
-    public void setHouseNo(String houseNo) {
-        this.houseNo = houseNo;
-    }
-
     public Double getCapacity() {
         return capacity;
     }
@@ -92,11 +57,11 @@ public class ContainerView {
         this.history = history;
     }
 
-    public List<Schedule> getSchedules() {
+    public Set<LocalDate> getSchedules() {
         return schedules;
     }
 
-    public void setSchedules(List<Schedule> schedules) {
+    public void setSchedules(Set<LocalDate> schedules) {
         this.schedules = schedules;
     }
 }

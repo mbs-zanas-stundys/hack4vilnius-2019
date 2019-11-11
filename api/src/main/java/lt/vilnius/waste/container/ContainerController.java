@@ -1,9 +1,9 @@
 package lt.vilnius.waste.container;
 
-import lt.vilnius.waste.container.dto.ContainerForDateView;
-import lt.vilnius.waste.container.dto.ContainerListView;
-import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
-import lt.vilnius.waste.container.dto.ContainerView;
+import lt.vilnius.waste.container.value.ContainerForDateView;
+import lt.vilnius.waste.container.value.ContainerListView;
+import lt.vilnius.waste.container.value.ContainerPickupHistoryView;
+import lt.vilnius.waste.container.value.ContainerView;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 

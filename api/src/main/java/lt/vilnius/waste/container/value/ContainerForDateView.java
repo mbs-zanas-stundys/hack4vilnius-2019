@@ -1,6 +1,6 @@
-package lt.vilnius.waste.container.dto;
+package lt.vilnius.waste.container.value;
 
-public class ContainerForDateView  extends ContainerListView{
+public class ContainerForDateView extends ContainerListView {
     private boolean missedPickup;
 
     public boolean isMissedPickup() {

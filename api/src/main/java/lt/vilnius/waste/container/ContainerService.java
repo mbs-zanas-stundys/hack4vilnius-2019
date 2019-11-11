@@ -1,15 +1,14 @@
 package lt.vilnius.waste.container;
 
+import lt.vilnius.waste.container.repository.WasteContainerRepository;
+import lt.vilnius.waste.container.value.ContainerForDateView;
+import lt.vilnius.waste.container.value.ContainerListView;
+import lt.vilnius.waste.container.value.ContainerPickupHistoryView;
+import lt.vilnius.waste.container.value.ContainerView;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import lt.vilnius.waste.container.dto.ContainerForDateView;
-import lt.vilnius.waste.container.dto.ContainerListView;
-import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
-import lt.vilnius.waste.container.dto.ContainerView;
-import lt.vilnius.waste.container.repository.WasteContainerRepository;
-
-import org.springframework.stereotype.Service;
 
 @Service
 public class ContainerService {
@@ -34,6 +33,7 @@ public class ContainerService {
     }
 
     public List<ContainerPickupHistoryView> getLowRatioContainers(LocalDate date) {
+
         return repository.getLowRationContainers(date);
     }
 

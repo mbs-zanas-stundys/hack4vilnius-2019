@@ -1,19 +1,25 @@
 package lt.vilnius.waste.container.repository;
 
+import lt.vilnius.waste.container.Pickup;
+import lt.vilnius.waste.container.upload.ContainerDto;
+import lt.vilnius.waste.container.value.ContainerForDateView;
+import lt.vilnius.waste.container.value.ContainerListView;
+import lt.vilnius.waste.container.value.ContainerPickupHistoryView;
+import lt.vilnius.waste.container.value.ContainerView;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import lt.vilnius.waste.container.Pickup;
-import lt.vilnius.waste.container.dto.ContainerForDateView;
-import lt.vilnius.waste.container.dto.ContainerListView;
-import lt.vilnius.waste.container.dto.ContainerPickupHistoryView;
-import lt.vilnius.waste.container.dto.ContainerView;
+import java.util.Set;
 
 public interface WasteContainerRepositoryCustom {
 
     List<ContainerListView> findByGeoLocation(Double longitude, Double latitude, Double distance);
 
-    Pickup pushHistory(String containerNo, Pickup history);
+    String addOrReplaceContainer(ContainerDto dto);
+
+    String savePickup(String containerNo, Pickup pickup);
+
+    String saveSchedules(String containerNo, Set<LocalDate> schedules);
 
     ContainerView getContainerView(String containerNo);
 

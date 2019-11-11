@@ -8,12 +8,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static java.util.Collections.singletonList;
+import java.util.Set;
 
 @Document(collection = "container")
 public class Container {
@@ -24,39 +20,13 @@ public class Container {
     private String containerNo;
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint position;
-    private String street;
+    private String address;
     private String company;
     private String location;
     private String houseNo;
     private Double capacity;
-    private List<PickupHistory> history;
-    private List<ScheduleHistory> schedule;
-
-    public Container withSchedules(Map<LocalDate, List<Schedule>> schedules){
-        schedules.forEach(this::withSchedules);
-        return this;
-    }
-
-    public Container withSchedules(LocalDate date, List<Schedule> schedule){
-        Stream.ofNullable(this.schedule)
-                .flatMap(Collection::stream)
-                .filter(s->s.getDate().equals(date))
-                .findFirst()
-                .ifPresentOrElse(h -> h.addAll(schedule),
-                        () -> setSchedule(singletonList(ScheduleHistory.newOf(date).addAll(schedule))));
-        return this;
-    }
-
-    public Container withHistory(Pickup pickup){
-        LocalDate date = pickup.getDate().toLocalDate().withDayOfMonth(1);
-        Stream.ofNullable(history)
-                .flatMap(Collection::stream)
-                .filter(s->s.getDate().equals(date))
-                .findFirst()
-                .ifPresentOrElse(h -> h.add(pickup),
-                        () -> setHistory(singletonList(PickupHistory.newOf(date).add(pickup))));
-        return this;
-    }
+    private List<Pickup> pickups;
+    private Set<LocalDate> schedules;
 
     public Double getCapacity() {
         return capacity;
@@ -106,12 +76,12 @@ public class Container {
         this.company = company;
     }
 
-    public String getStreet() {
-        return street;
+    public String getAddress() {
+        return address;
     }
 
-    public void setStreet(String street) {
-        this.street = street;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public GeoJsonPoint getPosition() {
@@ -122,19 +92,19 @@ public class Container {
         this.position = position;
     }
 
-    public List<PickupHistory> getHistory() {
-        return history;
+    public List<Pickup> getPickups() {
+        return pickups;
     }
 
-    public void setHistory(List<PickupHistory> history) {
-        this.history = history;
+    public void setPickups(List<Pickup> pickups) {
+        this.pickups = pickups;
     }
 
-    public List<ScheduleHistory> getSchedule() {
-        return schedule;
+    public Set<LocalDate> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(List<ScheduleHistory> schedule) {
-        this.schedule = schedule;
+    public void setSchedules(Set<LocalDate> schedules) {
+        this.schedules = schedules;
     }
 }
