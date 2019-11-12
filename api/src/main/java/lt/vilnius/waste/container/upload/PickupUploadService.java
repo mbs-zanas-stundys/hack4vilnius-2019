@@ -35,7 +35,7 @@ public class PickupUploadService implements UploadService {
     @Override
     public void fetchAndStore() {
         LOGGER.info("Upload started");
-        LocalDate startDate = LocalDate.now();
+        LocalDate startDate = LocalDate.now().minusDays(1);
         PageRequest request = PageRequest.of(1000);
         do {
             Page<PickupDto> page = restContainerService.getPickupsForDateRange(request, startDate, startDate);
