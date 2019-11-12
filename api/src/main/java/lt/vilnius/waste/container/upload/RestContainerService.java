@@ -40,15 +40,27 @@ public class RestContainerService {
     }
 
     public Page<ScheduleDto> getSchedulesPageForDate(PageRequest request, LocalDate dateFrom, LocalDate dateTo) {
-        URI requestUri = buildUrl("/waste-managment/container-schedule", dateFrom, dateTo, request);
-
+        URI requestUri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/waste-managment/container-schedule")
+                .queryParam("date_from", dateFrom)
+                .queryParam("date_to", dateTo)
+                .queryParam("limit", request.getSize())
+                .queryParam("page", request.getPageNo())
+                .build()
+                .toUri();
         return fetchFromUrl(requestUri.toString(), request, new ParameterizedTypeReference<>() {
         });
     }
 
     public Page<PickupDto> getPickupsForDateRange(PageRequest request, LocalDate dateFrom, LocalDate dateTo) {
-        URI requestUri = buildUrl("/waste-managment/container-schedule", dateFrom, dateTo, request);
-
+        URI requestUri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/waste-managment/container-service")
+                .queryParam("service_date_from", dateFrom)
+                .queryParam("service_date_to", dateTo)
+                .queryParam("limit", request.getSize())
+                .queryParam("page", request.getPageNo())
+                .build()
+                .toUri();
         return fetchFromUrl(requestUri.toString(), request, new ParameterizedTypeReference<>() {
         });
     }
@@ -65,14 +77,4 @@ public class RestContainerService {
                         .orElse(Page.empty());
     }
 
-    private URI buildUrl(String path, LocalDate dateFrom, LocalDate dateTo, PageRequest request) {
-        return UriComponentsBuilder.fromHttpUrl(baseUrl)
-                .path(path)
-                .queryParam("dateFrom", dateFrom)
-                .queryParam("dateTo", dateTo)
-                .queryParam("limit", request.getSize())
-                .queryParam("page", request.getPageNo())
-                .build()
-                .toUri();
-    }
 }

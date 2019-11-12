@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 
 @Service
@@ -50,7 +51,7 @@ public class PickupUploadService implements UploadService {
 
     @Scheduled(cron = "0 0 22 * * *")
     public void scheduledUpload() {
-        if (eventRepository.findByTypeAndDate(UploadType.PICKUP_UPLOAD, LocalDate.now()).isEmpty()) {
+        if (eventRepository.findByTypeAndDateBetween(UploadType.PICKUP_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDate.now().atTime(LocalTime.MAX)).isEmpty()) {
             fetchAndStore();
         }
     }

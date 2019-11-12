@@ -10,6 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 public class ContainerUploadService implements UploadService {
@@ -54,7 +56,7 @@ public class ContainerUploadService implements UploadService {
 
     @Scheduled(cron = "0 0 0 1 * *")
     public void scheduledUpload() {
-        if (eventRepository.findByTypeAndDate(UploadType.CONTAINER_UPLOAD, LocalDate.now()).isEmpty()) {
+        if (eventRepository.findByTypeAndDateBetween(UploadType.CONTAINER_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDate.now().atTime(LocalTime.MAX)).isEmpty()) {
             fetchAndStore();
         }
     }

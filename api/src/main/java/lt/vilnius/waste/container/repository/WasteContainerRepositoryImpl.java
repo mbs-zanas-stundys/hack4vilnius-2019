@@ -82,7 +82,7 @@ public class WasteContainerRepositoryImpl implements WasteContainerRepositoryCus
     public String saveSchedules(String containerNo, Set<LocalDate> schedules) {
         mongoTemplate.updateFirst(query(where("containerNo").is(containerNo)),
                 new Update()
-                        .addToSet("schedules", schedules),
+                        .addToSet("schedules").each(schedules.toArray()),
                 Container.class);
         return containerNo;
     }
