@@ -49,7 +49,7 @@ public class PickupUploadService implements UploadService {
         LOGGER.info("Upload finished");
     }
 
-    @Scheduled(cron = "0 0 22 * * *")
+    @Scheduled(cron = "0 0 6 * * *")
     public void scheduledUpload() {
         if (eventRepository.findByTypeAndDateBetween(UploadType.PICKUP_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDate.now().atTime(LocalTime.MAX)).isEmpty()) {
             fetchAndStore();
@@ -69,7 +69,6 @@ public class PickupUploadService implements UploadService {
         pickup.setDate(LocalDateTime.ofInstant(dto.getDate().toInstant(),
                 ZoneId.systemDefault()));
         pickup.setCompany(dto.getCompany());
-        pickup.setWasServiced(dto.getWasServiced() == 1);
         return pickup;
 
     }

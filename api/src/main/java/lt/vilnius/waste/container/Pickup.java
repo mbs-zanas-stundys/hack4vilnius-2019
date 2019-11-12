@@ -6,7 +6,6 @@ public class Pickup {
     private LocalDateTime date;
     private Double weight;
     private String company;
-    private Boolean wasServiced;
 
     public LocalDateTime getDate() {
         return date;
@@ -32,11 +31,4 @@ public class Pickup {
         this.company = company;
     }
 
-    public Boolean getWasServiced() {
-        return wasServiced;
-    }
-
-    public void setWasServiced(Boolean wasServiced) {
-        this.wasServiced = wasServiced;
-    }
 }
