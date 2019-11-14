@@ -49,9 +49,9 @@ public class PickupUploadService implements UploadService {
         LOGGER.info("Upload finished");
     }
 
-    @Scheduled(cron = "0 0 6 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void scheduledUpload() {
-        if (eventRepository.findByTypeAndDateBetween(UploadType.PICKUP_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDate.now().atTime(LocalTime.MAX)).isEmpty()) {
+        if (eventRepository.findByTypeAndDateBetween(UploadType.PICKUP_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDateTime.now()).isEmpty()) {
             fetchAndStore();
         }
     }

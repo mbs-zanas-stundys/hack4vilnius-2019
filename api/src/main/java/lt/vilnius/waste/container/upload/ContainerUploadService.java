@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import static java.time.LocalDate.now;
+
 @Service
 public class ContainerUploadService implements UploadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContainerUploadService.class);
@@ -54,9 +56,9 @@ public class ContainerUploadService implements UploadService {
         eventRepository.save(UploadEvent.now(UploadType.CONTAINER_UPLOAD));
     }
 
-    @Scheduled(cron = "0 0 0 1 * *")
+    @Scheduled(cron = "0 0 2 1 * *")
     public void scheduledUpload() {
-        if (eventRepository.findByTypeAndDateBetween(UploadType.CONTAINER_UPLOAD, LocalDate.now().atTime(LocalTime.MIN), LocalDate.now().atTime(LocalTime.MAX)).isEmpty()) {
+        if (eventRepository.findByTypeAndDateBetween(UploadType.CONTAINER_UPLOAD, now().atTime(LocalTime.MIN), LocalDateTime.now()).isEmpty()) {
             fetchAndStore();
         }
     }
